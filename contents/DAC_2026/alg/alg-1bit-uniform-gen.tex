@@ -1,0 +1,18 @@
+\begin{algorithm}[t]
+\footnotesize
+\caption{1-bit, uniform $\mathrm{S}$, test pattern generation \label{alg:1bit}}
+\begin{algorithmic}[1]
+\State $N_{\text{ADDRS}} \gets 10$
+\State $A \gets$ rand\_256B\_aligned\_addrs($N_{\text{ADDRS}}$)
+\ForAll{address \textbf{ in } $A$}
+    \ForAll{$\mathrm{S}$ \textbf{ in } [$\mathbf{0}$, $\mathbf{1}$]}
+        \State init\_$\mathrm{S}$(address, $\mathrm{S}$) \Comment{1, 256-byte write op}
+        \State $L \gets$ shuffle(range(0, 2047))
+        \ForAll{$i_{\text{b}}$ \textbf{ in } $L$}
+            \State toggle\_bit\_i\_twice($\mathrm{S}$, $i_{\text{b}}$) 
+            \Comment{2, 1-byte write ops}
+        \EndFor
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}

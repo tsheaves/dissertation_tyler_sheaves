@@ -1,0 +1,90 @@
+\section{Results}
+\label{sec:trng-results}
+
+\subsection{NIST SP~800-90B Entropy Estimates}
+Table~\ref{tab:nist90b} reports non-IID min-entropy estimates from
+$1\mathrm{M}$ samples per source across the nine NIST SP~800-90B
+estimators.
+
+\paragraph{4M Entropy Sources.}
+
+All three 4M conditions produce $\hat{H}_{\min} < 0.01$ bits/symbol
+(0.0060, 0.0051, and 0.0079 for RT-A, RT-B, and 55\textdegree{}C,
+respectively). The compression estimator returns the lowest values
+(0.0004 and 0.0046 for RT-A/B), confirming that latency sequences are
+highly compressible. All nine SP~800-90B estimators return near-zero
+values for every 4M condition, ruling out any estimator-specific
+artifact and confirming a fundamental collapse of source entropy under
+the runtime measurement regime. The near-zero estimates are consistent
+with a latency distribution that has collapsed to a near-deterministic,
+narrow support. The compression estimator value of $4\times10^{-4}$
+bits/symbol for RT-A approaches the theoretical minimum for a
+length-$1\mathrm{M}$ sequence over a 256-bin alphabet. The
+elevated-temperature condition yields a marginal improvement to
+$\hat{H}_{\min} = 0.0079$ bits/symbol; while thermal activation can
+increase filament stochasticity by reducing the energy barrier for
+vacancy migration~\cite{yu2012switching}, this effect is insufficient to
+rescue the 4M entropy source. The dominant limitation is structural, not
+thermal. The runtime entropy collapse is attributed to structural
+bursting effects. During characterization, the full sweep of burst
+configurations explored the bursting space under a diversity of stimuli
+(subsequent bursts are rotated by a single word independent of burst
+size). Under the runtime sequence, fixed-width bursts at burst-aligned
+offsets within the reserved 256\,B region collapse nearly all write
+latency variance. This sensitivity to stimulus disqualifies the 4M as a
+viable TRNG platform and exposes a fundamental limitation of
+characterization-only entropy evaluations.
+
+\input{contents/ICCAD_2026/tables/nist-90b-all-chips}
+
+\paragraph{8M Entropy Sources.}
+The 8M device produces $\hat{H}_{\min}$ of 2.4973 (RT-A), 1.6500 (RT-B),
+and 1.9844 (55\textdegree{}C) bits/symbol. The $t$-Tuple estimator is
+binding across all three conditions (2.8370, 1.7358, 2.2754), consistent
+with short-range thermal coupling between adjacent writes. The 0.34-bit
+restart penalty on RT-A reflects modest startup bias as the filament
+distribution converges after reset. Device-to-device variation of 0.85
+bits/symbol between RT-A and RT-B underscores the necessity of per-chip
+characterization. The 55\textdegree{}C result suggests thermal
+activation provides a real but bounded boost to filament stochasticity.
+The contrast with the 4M device is attributed to burst complexity. The
+8M crossbar is driven with 32-word bursts while the 4M uses 4-word
+bursts. The longer burst aggregates more switching events per
+transaction, increasing thermal heterogeneity across bitcells and
+reducing the degree to which any individual filament's history can
+dominate the aggregate latency measurement. This suggests a minimum
+burst complexity threshold below which the single-stimulus feedback loop
+is not broken by accumulated stochastic contributions from other cells.
+
+\input{contents/ICCAD_2026/tables/trng-tests-8m}
+
+\subsection{NIST SP~800-22 and PractRand}
+Given the near-zero entropy of the 4M under the runtime sequence, it is
+excluded from TRNG statistical validation. Table~\ref{tab:nist22}
+reports SP~800-22 results for 256\,KB of SHA-256-conditioned output from
+all three 8M sources across two independent runs each. All 15 tests pass
+for every source-run combination. $p$-values are well-distributed across
+$(0,1)$; the lowest observed is 0.01 (Binary Matrix Rank,
+55\textdegree{}C-R1). All three streams pass PractRand through 256\,KB
+with no anomalies at any evaluation threshold, confirming that no
+artifacts from the repeating $S_{opt}$ sequence or wear-leveling pattern
+persist through conditioning. The final TRNG achieves a throughput of
+1.7\,kbits/s.
+
+\subsection{Relationship to Prior Work}
+The 4M failure does not disqualify COTS ReRAM entropy harvesting in
+general, nor does it imply that the device contains no stochastic
+dynamics. Arul et al.~\cite{tolga2024trng} obtained non-trivial
+min-entropy from the same device family by applying randomized write
+patterns followed by aggressive von Neumann
+debiasing~\cite{von1963various}. The structural latency component
+removed in Section~\ref{sec:trng-structural} was on the order of tenths
+of a millisecond, while the timer resolution used
+in~\cite{tolga2024trng} likely operated at the MHz level. The present
+work confirms that under the more conservative fixed-sequence regime
+demanded by a stationary entropy source evaluation, the 4M device cannot
+sustain an exploitable entropy rate. ECC knowledge is necessary but not
+sufficient for an efficient COTS ReRAM TRNG; the underlying crossbar
+architecture must not dominate timing behavior at the chosen burst
+configuration, and runtime evaluation under the intended operational
+sequence is required.

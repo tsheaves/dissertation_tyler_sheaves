@@ -1,0 +1,21 @@
+% alg1.tex
+\begin{algorithm}[t]
+\footnotesize
+\DontPrintSemicolon
+\caption{Wear-leveled sequence generation\label{alg:seqgen}}
+\KwIn{$[n,k,d_{\min}]$ generator $\mathbf{G}$, initial state $s$, length $L$}
+$\mathcal{C} \leftarrow \{\mathbf{u}\mathbf{G} \bmod 2 : \mathrm{wt}(\mathbf{u}\mathbf{G}) = d_{\min}\}$
+
+Solve ILP: $\mathbf{x}^{*} = \arg\min\,(\max_{j} t_{j} - \min_{j} t_{j})$, \tcp*{Dmin cws}
+$\sum_{i} x_{i} = L$,\ $x_{i} \in \mathbb{Z}_{\geq 0}$\;
+
+$\mathcal{S}_{D_{min}} \leftarrow$ codeword $i$ repeated $x_{i}^{*}$; \\
+get min. balanced $\mathcal{S}_{\mathrm{meas}} \subseteq \mathcal{S}_{\mathrm{d}}$\;
+Sample pool of $P \gg L$ codewords, $\mathrm{wt} \in \{\lfloor n/2\rfloor, \lceil n/2\rceil\}$
+
+\For{$i \leftarrow 1$ \KwTo $L$}{
+    Append pool codeword minimizing $\max_{j} t_{j} - \min_{j} t_{j}$\;
+}
+
+$\mathcal{S}_{n} \leftarrow$ all-toggle word repeated $L$ times \tcp*{full}
+\end{algorithm}

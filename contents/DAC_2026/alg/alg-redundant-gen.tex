@@ -1,0 +1,17 @@
+\begin{algorithm}[b]
+\footnotesize
+\caption{redundant write test pattern generation \label{alg:red}}
+\begin{algorithmic}[1]
+\State $N_{\text{ADDRS}} \gets 10$
+\State $A \gets$ rand\_256B\_aligned\_addrs($N_{\text{ADDRS}}$)
+\ForAll{address \textbf{ in } $A$}
+    \State $\mathrm{S} \gets$ get\_rand\_256B\_pattern() 
+    \State $L \gets$ shuffle(range(1, 256))
+    \State write\_$\mathrm{S}$(address, $\mathrm{S}$) \Comment{1, 256-byte write op}
+    \ForAll{$i$ \textbf{ in } $L$}
+        \State write\_bytes(address, $\mathrm{S}[0{:}i]$) 
+        \Comment{1, $i$-byte write op}
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}

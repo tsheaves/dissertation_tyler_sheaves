@@ -1,0 +1,24 @@
+\begin{table}[t!]
+\centering
+\caption{The effects of directional Hamming distance (DHD) on write latency, $t_{w}$.}
+\label{tab:polarity-mix}
+\vspace{-0.55em}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc@{}}
+\toprule
+
+% Generalized
+\textbf{Category} &
+\textbf{$w_{0\to1}$} & 
+\textbf{$w_{1\to0}$} &
+\textbf{Example} &
+$\mathbf{t_{w}}$ \\
+\midrule
+$\texttt{NONE}$         & $0$ & $0$ & $\texttt{0xAAAA} \to \texttt{0xAAAA}$ & Min \\
+$\texttt{UNIPOLAR}_{N}$ & $0$ & $>0$ & $\texttt{0xAAAA} \to \texttt{0x8888}$ & Int-N \\
+$\texttt{UNIPOLAR}_{P}$ & $>0$ & $0$ & $\texttt{0xAAAA} \to \texttt{0xBBBB}$ & Int-P \\
+$\texttt{BIPOLAR}$      & $>0$ & $>0$ & $\texttt{0xAAAA} \to \texttt{0x5555}$ & Max \\
+
+\bottomrule
+\end{tabular*}
+% \vspace{-.45cm}
+\end{table}

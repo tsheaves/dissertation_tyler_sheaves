@@ -1,0 +1,114 @@
+\begin{abstract}
+%Cloud Field Programmable Gate Arrays (FPGAs) are an attractive option for accelerating computation without purchasing a multi-thousand-dollar FPGA. 
+%FPGA virtualization increases utilization by supporting multiple concurrent users/tenants. 
+%Unfortunately, side-channel leakage poses a significant security threat for multi-tenant FPGAs. 
+%Unfortunately, a malicious tenant can instantiate a 
+\Sensors measure minute changes in an FPGA power distribution network, allowing attackers to extract information from concurrently executing computations. Previous \sensors make assumptions about the co-tenant computation and require the attacker have \textit{a priori} access or system knowledge to tune the sensor parameters statically. Additionally, prior \sensors make use of proprietary vendor intellectual property and do not provide guidance on sensor migration to other vendors. We present the open-source design of the \name Time-to-Digital Converter, which introduces three dynamically tunable parameters that optimize signal measurement, including the transition polarity, sample window, frequency, and phase. %We show that an improperly tuned sensor provides a suboptimal signal measurement. 
+We show that a properly tuned sensor improves co-tenant classification accuracy by 2.5$\times$ over prior work and increases the ability to identify the co-tenant computation and its microarchitectural implementation. Across 13 varying applications, our techniques yield an 80\% classification accuracy that generalizes beyond a single board. Our sensor improves the ability of a correlation power analysis attack to rank correct subkey values by 2$\times$. As an extension to our prior work, we show that the \sensor is portable to multiple FPGA vendors, and we demonstrate implementations on both Xilinx and Intel FPGA systems.
+
+%Prior work is deficient in three ways: 
+%First, existing voltage fluctuation sensor architectures perform suboptimal signal measurement of leaky co-tenants.
+%Second, side-channel attacks of this variety often assume when and what co-tenant computation is running before a key recovery attack can be preformed.
+%Third, prior work assumes that they have access to the board before a co-tenant is instantiated.
+
+%In this paper we present the open-source design of the \name Time-to-Digital Converter, which introduces three dynamically tunable parameters that optimize signal measurement.
+%We demonstrate that this can be used to improve co-tenant classification accuracy by 2.5$\times$ over prior work.
+%We show that it is possible to identify the type of computation as well as the microarchitectural implementation of a co-tenant's computation.
+%Across 13 varying applications, our techniques yield an 80\% classification accuracy on 5-board, leave-one-out cross-validation, demonstrating that our attack generalizes beyond a single board environment.
+%Finally, when an attack is performed, our sensor improves the rate at which all correct subkey values are ranked as most likely by 2$\times$ in a Correlation Power Analysis attack.
+
+%In conjunction, our result is the first of its kind pipeline for maximizing recovered leaked information, recognizing co-tenant computation, and performing a key recovery attack. 
+
+%This work leverages the \name Time-to-Digital Converter (TDC) 
+
+
+%This work presents the \name Time-to-Digital Converter (TDC) -- a voltage fluctuation sensor with three dynamically tunable parameters: the sample duration, sample clock phase, and sample clock frequency.
+%The sensor captures both rising and falling transition polarities which provides additional information about the target computation.
+
+%This paper demonstrates that parameter selection, dynamic tuning, and noise reduction techniques are essential for mitigating extremely non-linear behaviors within TDC sensors in order to extract information about a co-tenant computation.
+%We measure the impact of these techniques in a multi-tenant scenario where the attacker must identify the type of computation (AES, PRESENT, Ring-Oscillator, Arithmetic-Heavy, and No-Sensor) as well as microarchitectural implementation (Microblaze, ORCA, PicoRV32, and CortexM3) of a co-tenant.
+%Our results show that 13-way classification accuracy on 5-board, leave-one-out cross-validation, can be improved by 2.5$\times$, from 32\% to 80\% and that noise reduction techniques reduce the interquartile range of cross-validation loss by 5.8$\times$. After successfully identifying an AES computation with our classification network, we demonstrate that proper sensor calibrations increases the frequency with which all correct subkey values are ranked as most likely by 2$\times$ in a Correlation Power Analysis attack.
+
+%\dr{It would be good to fit in something about how it is necessary to generalize across boards with high accuracy - this would make our story stronger. For example, This serves as a necessary precursor for exploits in a virtualized FPGA environment, where an attacker must identify a co-located application before performing an attack using information gathered from other boards. (I don't like the end of my sentence, which is why it's not in there)}.
+% Not sure how to summarize Liv's cross-validation result. Would be nice to mention this improves generality
+% improve the generality of the trained classifier by reducing
+% leave-one-out crooss-validation
+\end{abstract}
+
+\begin{comment}
+
+Side-channel leakage poses a major security threat in multi-tenant FPGA environments.
+One tenant can instantiate a voltage fluctuation sensor that measures minute changes in the power distribution network (PDN) and infer information about co-tenant computation and data. 
+This work presents the \name Time-to-Digital Converter (TDC) -- a voltage fluctuation sensor with two unique elements: first, it has the ability to tune the sample duration, phase, and frequency to more effectively extract information about the co-located computation; second, it captures both rising and falling transitions which provides unique information about the target computation. 
+In this paper, we show that TDC sensors exhibit extremely non-linear behaviors depending on their sampling parameters.
+We show that the sensor's phase relationship with respect to the co-tenant computation plays an important role in extracting information. 
+We present a method for tuning the sensor sampling period to align with a co-tenant's application.
+We show that rising and falling transitions encode unique information about a co-tenant's computation.
+Finally, we describe three propagation metrics and compare their ability to extract information about co-tenant computations.
+
+These techniques are leveraged in a multi-tenant attack scenario, where a user aims to determine from power-traces the type of computation (AES, PRESENT, power waster, baseline) as well as microarchitectural implementation (Microblaze, ORCA, and PicoRV32) of a co-tenant. We find that in the worst case, a frequency-based classification has a 39\% classification accuracy, improved to 67\% with proper phase tuning, and 87\% with the introduction of a the falling transition.
+\end{comment}
+\begin{comment}
+
+\begin{abstract}
+Side-channel leakage poses a major security threat in multi-tenant FPGA environments. A tenant can instantiate a voltage fluctuation sensor that measures minute changes in the power distribution network (PDN) and infer information about co-tenant computation and data. 
+This work presents the \name Time-to-Digital Converter (TDC) -- a voltage fluctuation sensor with three dynamically tunable parameters: the sample duration, sample clock phase, and sample clock frequency.
+The sensor captures both rising and falling transition polarities which provides additional information about the target computation.
+
+This paper demonstrates that parameter selection, dynamic tuning, and noise reduction techniques are essential for mitigating extremely non-linear behaviors within TDC sensors in order to extract information about a co-tenant computation.
+We measure the impact of these techniques in a multi-tenant scenario where the attacker must identify the type of computation (AES, PRESENT, Ring-Oscillator, Arithmetic-Heavy, and No-Sensor) as well as microarchitectural implementation (Microblaze, ORCA, PicoRV32, and CortexM3) of a co-tenant.
+Our results show that 13-way classification accuracy on 5-board, leave-one-out cross-validation, can be improved by 2.5$\times$, from 32\% to 80\% and that noise reduction techniques reduce the interquartile range of cross-validation loss by 5.8$\times$. After successfully identifying an AES computation with our classification network, we demonstrate that proper sensor calibrations increases the frequency with which all correct subkey values are ranked as most likely by 2$\times$ in a Correlation Power Analysis attack.
+
+%\dr{It would be good to fit in something about how it is necessary to generalize across boards with high accuracy - this would make our story stronger. For example, This serves as a necessary precursor for exploits in a virtualized FPGA environment, where an attacker must identify a co-located application before performing an attack using information gathered from other boards. (I don't like the end of my sentence, which is why it's not in there)}.
+% Not sure how to summarize Liv's cross-validation result. Would be nice to mention this improves generality
+% improve the generality of the trained classifier by reducing
+% leave-one-out crooss-validation
+\end{abstract}
+\end{comment}
+
+\begin{comment}
+
+Side-channel leakage poses a major security threat in multi-tenant FPGA environments.
+One tenant can instantiate a voltage fluctuation sensor that measures minute changes in the power distribution network (PDN) and infer information about co-tenant computation and data. 
+This work presents the \name Time-to-Digital Converter (TDC) -- a voltage fluctuation sensor with two unique elements: first, it has the ability to tune the sample duration, phase, and frequency to more effectively extract information about the co-located computation; second, it captures both rising and falling transitions which provides unique information about the target computation. 
+In this paper, we show that TDC sensors exhibit extremely non-linear behaviors depending on their sampling parameters.
+We show that the sensor's phase relationship with respect to the co-tenant computation plays an important role in extracting information. 
+We present a method for tuning the sensor sampling period to align with a co-tenant's application.
+We show that rising and falling transitions encode unique information about a co-tenant's computation.
+Finally, we describe three propagation metrics and compare their ability to extract information about co-tenant computations.
+
+These techniques are leveraged in a multi-tenant attack scenario, where a user aims to determine from power-traces the type of computation (AES, PRESENT, power waster, baseline) as well as microarchitectural implementation (Microblaze, ORCA, and PicoRV32) of a co-tenant. We find that in the worst case, a frequency-based classification has a 39\% classification accuracy, improved to 67\% with proper phase tuning, and 87\% with the introduction of a the falling transition.
+
+\end{comment}
+
+\begin{comment}
+Side-channel leakage poses a major security threat in multi-tenant FPGA environments.
+One tenant can instantiate a voltage fluctuation sensor that measures minute changes in the power distribution network (PDN) and infer information about co-tenant computation and data. 
+%Such sensors have already been demonstrated capable of traditional power analysis attacks like DPA.
+This work presents the \name Time-to-Digital Converter (TDC) -- a voltage fluctuation sensor with two unique elements: first, it has the ability to tune the sample duration, phase, and frequency to more effectively extract information about the co-located computation; second, it captures both rising and falling transitions which provides unique information about the target computation. 
+
+In this paper, we show that TDC sensors exhibit extremely non-linear behaviors depending on their sampling parameters.
+%We analyze these behaviors and present a variable capture window that enables one to tune the sensor to maximize information gain.
+We show that the sensor's phase relationship with respect to the co-tenant computation plays an important role in extracting information. 
+%A phase misalignment between the sensor sample time and a co-tenant's computation can miss relevant information in the PDN.
+We present a method for tuning the sensor sampling period to align with a co-tenant's application.
+We show that rising and falling transitions encode unique information about a co-tenants computation.
+Finally, we describe three propagation metrics and compare their abilities to extract information about co-tenant computations.
+
+Our experiments demonstrate that transition choice, metric selection, and tuning, are important factors in channel capacity maximization: a poorly tuned sensor provides 0 bits of information while the best transition-metric pair improves entropy by 2.3 bits at 25 MHz.
+%\rk{We show that considering dual edges and tuning can result in swings of over 2 bits of channel capacity.} \rk{This last statement is a bit precarious, but it would be nice to have a result at the end...Basically my idea here is to compare the worst case in Entropy across any (theta, phi, edge) combination vs. the best case (theta, phi, edge) combination. This seems to be around 2 bits.  } 
+
+
+%\dr{I am against acronyms in the abstract} \rk{generally I agree, but here we are using them multiple times, so less problematic for me. Feel free to change if it still bothers you.}
+
+%ADD SOME IMPRESSIVE RESULT FOR EXAMPLE: We show that by tuning the circuit results in 10X differences in variation in the PDN. 
+
+
+
+%Attacks leveraging the Power Distribution Network (PDN) of FPGAs such as DPA have been demonstrated. 
+
+%Traditional attacks 
+%Fault attacks and Differential Power Analysis (DPA) and have been demonstrated through exploitation of a shared the Power Distribution Network (PDN) of the FPGA.
+
+%Time-To-Digital Converters measure minute fluxuations within the Power
+\end{comment}

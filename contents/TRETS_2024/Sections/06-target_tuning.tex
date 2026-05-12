@@ -1,0 +1,188 @@
+\begin{comment}
+\subsection{Metric Effect on Measured Information}
+\label{channel_capacity}
+
+\rk{We need to be very careful here. Channel capacity has a precise defintion, and it is not entropy (mutual information). It is ok to say entropy is a measure of the amount of information present at some combination. Rename this subsection to something else?}\dr{My mistake, I agree. We need to standardize this probably.} 
+
+While it is useful to understand the benefits of different metric-polarity combinations, we ultimately want to know which combination provides the most information about the co-tenant. To answer this, we sweep $\phi$ across all possible values to determine which metric-polarity combination demonstrates the best entropy over a comlete tuning period. To compute entropy for a given position of $\phi$ we compute the observed probability of each output value times the binary logarithm of that probability, and sum all those values together. 
+%\dr{Describe entropy calculation}.
+The entropy provides a measure about the amount of information that is present in the trace.
+
+In this experiment $\phi$ is varied in 14.88ps / 2.3373E-3 radian increments across 0 to $4\pi$ on the Orca-AES target implemented on the PYNQ-Z2. 
+%Two such sweeps are taken, once when the Orca-AES computation is inactive (Background) \dr{Why do we need background in this graph? I'd take it out and use it later}, and again once the computation is enabled.
+$F_{sample}$ is equal to 25 MHz, and at each value of $\phi$ we gather a trace of 1024 samples and compute the entropy and standard deviation of the trace for each metric-polarity combination. The \textit{Binary Hamming Distance} is also computed along the trace, and the average of that set is taken. 
+Since $\phi$ is the relationship between the sampling clock and the target clock we expect that the output is periodic over 2$\pi$.
+
+\input{fig/orca-entropy}
+Figure~\ref{fig:orca-entropy} demonstrates the results of this experiment. We plot the average \textit{Binary Hamming Distance} for both transition polarities ($\uparrow\Delta\mu$ and $\downarrow\Delta\mu$) of the active Orca-AES. The standard deviation follows directly bellow the \textit{Binary Hamming Distances} for Orca-AES under our three metrics of propagation for each transition polarity ($\uparrow\sigma$ for rising and $\downarrow\sigma$ for falling). Finally we plot the entropy again with the Orca-AES computation for the three metrics of propagation for each transition polarity($\uparrow S$ for rising and $\downarrow S$ for falling).
+
+There is an apparent set of 8 peaks over $4\pi$ within the \textit{Binary Hamming Distance} of both transition polarities ($\uparrow\Delta\mu$ and $\downarrow\Delta\mu$) within the $\phi$ sweep. This implies the existence of 100~MHz synchronous logic which is not caused by the 25~MHz Orca-AES computation. We attribute these peaks to the activity of the sensor itself, and is discussed in Section \ref{target_clock_tuning}. However, a trough emerges at $\frac{\pi}{2}$ and a peak at $\frac{3\pi}{2}$ within $\uparrow\Delta\mu$, which we attribute to the activity of Orca-AES computation. We note that the same relationship is expressed within $\downarrow\Delta\mu$ but with an offset of $\pi$, an artifact of the fact that rising and falling transitions are $\pi$ offset.
+
+While it is interesting to know where within the 25MHz period (2$\pi$, 40ns) the Orca-AES computation has an an effect on the \textit{Binary Hamming Distance}, it is more important to know where in $\phi$ information relevant to the co-tenant is maximized---for this we turn to standard deviation and entropy. The first guiding observation for the remainder of this paper is that the falling transition under the \textit{Binary Hamming Distance} metric maximizes entropy/information capacity ($\downarrow S$). This metric and transition choice achieves a non-transient maximum entropy of $\sim$2 bits, in contrast to a non-transient maximum of $\sim$1.5 bits ($\uparrow S$). 
+
+Second, we note that standard deviation is well correlated with entropy between both transition types. This becomes an important consideration for the rest of this paper, as we use standard deviation, or rather, the more efficiently computable variance, to quickly approximate the information capacity of our sensor as we tune to a co-tenant application. 
+
+\end{comment}
+%\input{fig/capture-miss}
+\input{fig/AWS-SO-diff}
+\input{fig/phi-sweep-intel}
+%\input{fig/PYNQ-SO-diff}
+%\input{fig/PYNQ-AES-diff}
+
+\subsection{$\phi$ Tuning and Background Subtraction}
+\label{target_clock_tuning}
+
+%\rk{I would mostly let figs 6 and 7 drive the discussion. Some thoughts on key points:}
+
+%\rk{Fig 6: Describe the figure. Major points: 1) There is a clear and unsurprising cyclic pattern in pdn behevior across the cycle of a co-tenant target, i.e., it clearly shows five 5 cycles of the target computation. 2) Each target computation has a unique signature. This is due to the structure of the circuit. These roughly correspond to changes in its power consumption. This is evident b/c baseline has very little hamming change (ie., little power consumptions changes). And there is evidence of the power consumption of the sensor itself (100 mhz sensor frequency is showing up, right?). PW have a much bigger swing and they consume more power. They also show clear periodic behavior in line with the circuit behavior (on half cycle, off half cycle). ORCA exhibits another unique signature. We don't know exactly what it is, but I think we can just say it is different. }
+
+%\rk{Fig 7: Describe figure. Mention it is focusing on one phi cycle since it is periodic wrt to that (as demonstrated in fig 6). Major points: 1) Indicates that the information communicated across phi is not uniform. Some places more than 2 bits of entropy while others close to 0. This indicates that phi tuning is important. 2) Shows that the metric makes a difference. Hamming distance is the best and reaches the upper bound on capacity for this data set. First/last not as good. Thus, Hamming provides a good choice for a metric since it is an efficient summary statistic (fast to compute, efficient to store). }
+
+$\phi$ is the phase relationship between the target clock and the launch clock of the sensor.
+Our \name TDC can dynamically adjust $\phi$ to tune to the target clock and maximize measured information.
+This provides the ability to reliably isolate where information channel is maximized between the co-tenant and sensor.
+This has a significant impact on the side-channel information.
+
+To demonstrate this, we sweep $\phi$ through two complete phase rotations (4$\pi$).
+For $F_{sample}$ equal to 25 MHz this corresponds to 80ns.
+This process is performed twice: once as a measure of the background environment when the computation is disabled, and again when a co-tenant has been enabled.
+At each position of $\phi$, two traces of $1024$ samples are captured.
+One trace records the rising transition polarity ($\uparrow$) where $\theta$ maximizes the rising transition standard deviation samples and the other trace records the falling transition polarity ($\downarrow$) where $\theta$ maximizes the falling transition standard deviation samples.
+The \textit{Binary Hamming Distance} is computed for each of these transition types.
+The average ($\mu$) as well as standard deviation ($\sigma$) of each trace is calculated. 
+
+%Figure \ref{fig:phi-diff} demonstrates the result of sweeping $\phi$ over the range of 4$\pi$ on three different designs: \textit{AWS Sensor Only}, \textit{PYNQ-Z2 Sensor Only} and \textit{PYNQ-Z2 PicoRV AES}.
+Figures \ref{fig:phi-aws-base}, \ref{fig:phi-pynq-pico}, and \ref{fig:phi-pynq-base} demonstrate the result of sweeping $\phi$ over the range of 4$\pi$ on three different designs: \textit{AWS Sensor Only}, \textit{PYNQ-Z2 Sensor Only} and \textit{PYNQ-Z2 PicoRV AES}.
+The first and fifth row in each subfigure plot the zero-centered trace average for the rising transition ($\uparrow\Delta\mu$) and falling transition ($\downarrow\Delta\mu$). 
+The raw offset in the \textit{Binary Hamming Distance} is unimportant, so we consider the deviations from the average across all values of $\phi$.
+The blue line is the data recorded when the computation is off (Background), and the red line is the data recorded when the target was on (if applicable). The second and the sixth row plot the point-wise difference between the red and the blue line in their respective preceding plots. The third and the seventh row in each subfigure plot the trace \textit{Binary Hamming Distance} standard deviation ($\sigma$) for the rising transition ($\uparrow\sigma$) and falling transition ($\downarrow\sigma$). The fourth and eighth plots are point-wise difference between the red and blue line in their respective preceding plots.
+
+Following the same methodology, Figure \ref{fig:phi-intel} demonstrates a sweep of $\phi$ on the DE10-Nano NIOS-V/M design across two complete rotations of the target clock. This sweep is constructed from multiple coarse-grained sweeps of $\phi$. The clock generator is configured with settings produced by the PLL configuration prepossessing algorithm with $Tune=``phi"$. At each configuration two sets of $2^{12}$ samples are measured. 
+
+%\input{fig/PYNQ-AWS-diff}
+
+%\cd{discuss why there is a 180 degree offset between peaks.}
+%We consider the following designs under this analysis. 
+
+%To understand this effect, we perform a $\phi$ sweep on three of our applications: baseline, modified power wasters with synchronous 25MHz enable/disable, and ORCA running AES. 
+
+%\rk{mention relationship with theta. This is a coarser grain tuning that allows one to focus on where within the clock cycle of the target application to sense?} \cd{Hopefully better}
+
+%Figure~\ref{fig:phi-shift} depicts the relationship between $\phi$ and the output of the \name TDC as $\phi$ is swept through five periods of the $25$MHz $F_{sample}$ frequency.
+%For each value of $\phi$ a trace of $128$ samples is gathered.
+%For each trace we report the average value of the Falling Transition using the \textit{Binary Hamming Distance Metric}. \cd{intro to baseline difference/figures}
+
+
+\paragraph{AWS Sensor Only: }
+Figure \ref{fig:phi-aws-base} shows the behavior of the Sensor Only design on the AWS platform. The Background sweep is performed to record the environment. A second background sweep is then performed to determine whether background is consistent across multiple sweeps of $\phi$. A clear signal emerges in the \textit{Binary Hamming Distance} of both edges on both background sweeps (rows 1 and 5, $\uparrow\Delta\mu$ and $\downarrow\Delta\mu$). When the difference of the two $\phi$ sweeps is taken, the \textit{Binary Hamming Distance} ($\uparrow\Delta\mu$ and $\downarrow\Delta\mu$) as well as the standard deviation ($\uparrow\sigma$ and $\downarrow\sigma$), is reduced to a flat line. 
+
+The results demonstrate that there is significant background noise that has an effect on both the \textit{Binary Hamming Distance} as well as the standard deviation of a trace. 20 peaks of equal amplitude appear over a range of 80~ns within the \textit{Binary Hamming Distance}, which implies the existence of 250~MHz logic on the FPGA, likely the AWS shell logic which. Using background subtraction techniques~\cite{piccardi2004background} it can be removed to isolate the target.
+
+\paragraph{PYNQ-Z2 Sensor Only: }
+Figure \ref{fig:phi-pynq-base} demonstrates the same experiment on the PYNQ-Z2 platform.
+We now observe background peaks that indicate 100~MHz synchronous logic. 
+As on AWS, this information is consistent across multiple sweeps.
+When the background is subtracted, all variation in \textit{Binary Hamming Distance} and standard standard deviation is reduced to a noisy flat signal. 
+
+
+
+\paragraph{PYNQ-Z2 PicoRV AES: }
+Figure \ref{fig:phi-pynq-pico} demonstrates the same experiment performed on PYNQ-Z2 platform when the PicoRV AES design is operating at 25 MHz.
+In contrast to the previous two experiments, we take a single background sweep of $\phi$ with the PicoRV core deactivated, then another sweep of $\phi$ with the processor activated.
+The difference between the deactivated/activated $\phi$ sweeps produces a peak (yellow) that highlights the correct $\phi$ tuning.  %in \textit{Binary Hamming Distance} and standard deviation plots. 
+
+Background subtraction produces a single distinct peak over a range of 2$\pi$ in the \textit{Binary Hamming Distance} ($\Delta\mu$) and standard deviation ($\sigma$) plots.
+We attribute this single peak to the PicoRV AES core running at 25~MHz.
+This behavior is consistent across designs, algorithms, and architectures.
+The position of $\phi$ represents not just where standard deviation is maximized (which may be muddied by the presence of background information), but where the channel contains maximum information about the co-tenant.
+We show in Section \ref{classification} that this is  the best location for tuning the sensor and recovering side-channel information. 
+
+\paragraph{DE10-Nano NIOSV/M: }
+Figure~\ref{fig:phi-intel} demonstrates the same experiment performed on PYNQ-Z2 with PicoV AES on the DE10-Nano with NIOS-V/M design with a 25MHz clock frequency. In this experiment, we take advantage of the improved phase-step resolution from our PLL configuration prepossessing algorithm. Additionally we sweep $\phi$ using subsets of coarse-grained sweeps described above. We observe much more variance in the trace when compared to the Xilinx systems and we are able to clearly distinguish the 25MHz NIOS-V/M target peak. The yellow highlighted region identifies where the channel contains maximum information about the co-tenant NIOS-V/M core.
+
+Sweeping phi using a set of PLL counter configurations requires checks on the PLL lock status, and frequent resets of the clock generators and sensor logic in the launch and capture clock domain. These requirements are different from Xilinx where the only operations performed on the clock generator PLLs are a minimum phase step increment. In the Xilinx scheme, the cascaded PLLs of clock generator 1 and 2 can withstand small phase step increments on the upstream clock generator without a loss of lock on the downstream clock generator. 
+
+Our PLL configuration prepossessing algorithm improves the resolution of $\theta$ and $\phi$ by using many PLL counter configurations with varying $F_{vco}$ to produce a range of phase-step increments. While this technique improves the average phase step, it requires re-configuring the upstream PLL counters to make adjustments to $\phi$. Intel PLL counter reconfiguration requires a reset to the PLL to re-initiate the locking procedure. A reset to the clock generators causes the pulse generator to no longer be synchronized with the initial position of the $\phi$ sweep. This loss of synchronization distorts the output. An alternative approach is to never reset during a sweep of $\phi$ within the sweep measurement period (0 to $2\pi$ of the target clock). To achieve this, we can describe our high resolution $\phi$ sweep as many composite coarse-grained $\phi$ sweeps. 
+
+We identify each coarse-grained sweep by partitioning the set of PLL configurations by matching counter values. These subset can be described as independent coarse-grained sweeps of $\phi$. The benefit to performing many coarse-grained $\phi$ sweeps is that there is no requirement for resetting the PLLs after initializing the counter values of each coarse-grained sweep. Within each coarse-grained sweep only phase bumps are performed on the upstream clock generator and if a loss of lock occurs in the downstream generator we wait for it to relock before sampling the sensor output. This allows the pulse generator in the launch clock domain to remain stable during each coarse-grained sweep. With this approach, we are able to perform the composite coarse-grained sweeps independently and overlay each coarse-grained sweep result to produce the fine-grained $\phi$ result shown in Figure \ref{fig:phi-intel}.
+
+%\cd{offer more about what we think this peak is. This is what the actual co-tenant introduces to the system and so we believe that should be the target for tuning.}
+
+\begin{comment}
+\subsubsection{Baseline}
+Figure~\ref{fig:phi-base} depicts the output of the \name TDC as a function of $\phi$ in the Baseline design.
+Since there is almost no logic aside from the sensor, there is little effect on the PDN and the range of the output is the smallest of the three applications. 
+There is however some small periodicity in the graph.
+The output in the graph oscillates $20$ times over a range of ${\sim}1$ bit through the duration of the $200$ns change in $\phi$, suggesting the existence of $100$MHz synchronous logic on fabric. 
+This could be a signature of the sensor's own $100$MHz MMCM, memory interfaces, and other logic to make the sensor work which do not shift alongside $\phi$. 
+\end{comment}
+
+\begin{comment}
+\subsubsection{Synchronous Power Waster}
+Figure~\ref{fig:phi-pw}, depicts the output of the \name TDC as a function of $\phi$ for the Synchronous Power Waster design.
+We observe five peaks over the $200$ns region of $\phi$ with a range of greater than 10 bits.
+This implies that the \name TDC sensor is being affected by variations that occur on a 25MHz clock, which is equal to the frequency of the target clock. While the synchronous power wasters provide an interesting experimental result, it is optimistically high in terms of synchronous power consumption (compared to standard FPGA applications) and contains no confidential information.
+%it is not a realistic use case for extracting side-channel information. 
+%\rk{provide more explanation/justification why it isn't realistic? I don't quite follow this logic.}
+\end{comment}
+\begin{comment}
+\subsubsection{ORCA}
+We perform the same experiment on the ORCA soft-processor running an AES encryption. Figure~\ref{fig:phi-orca} demonstrates the results of sweeping $\phi$ for the ORCA processor running AES. We immediately note that again, five peaks appear over the course of the $200$ns shift of $\phi$. This repetition is expected as the ORCA is running at $25$MHz. As with the synchronous power wasters, the average falling \textit{Binary Hamming Distance} alternates between high values at ${\sim}29$, to low values at ${\sim}26$. The range of the \textit{Binary Hamming Distance} is far less than the synchronous power wasters but greater than that of the baseline. This indicates a lesser power consumption of the ORCA than the power waster, but greater than that of the baseline. \end{comment}
+
+%\rk{mention something about the range -- this one is not as large as power wasters but bigger than baseline. Discuss how this is related to the power draw. } 
+
+%Further investigation is needed to determine the source of the variationsChannel within the meta-peaks. 
+
+
+
+
+
+
+\begin{comment}
+TDCs are periodic instruments, in that sampling occurs for a finite period at a specified frequency. Figure~\ref{fig:capture-miss} provides motivation for a system to re-position \rk{tune?} the TDC phase $\phi$ in order to better capture information about a co-tenant's computation. 
+The window in time that the output of the TDC is affected by the PDN is represented through blue regions in Figure~\ref{fig:capture-miss}. Wave \rk{wave seems strange to me. Maybe just line? } (1) represents a clock to a hypothetical target computation, with (2) demonstrating the effects of that computation on the PDN. It is showing that the PDN is only disturbed in the time directly after the rising clock edge. 
+
+A TDC sampling window occurs during the time that a pulse is generated and propagating down the delay line until it is captured in the output register. (3) shows the sampling time in blue. The sampling window of this TDC sensor falls outside of the period of valuable information in the PDN. We describe a method for re-positioning the sampling region from wave (3) to wave (4)---where the TDC's sample coincides with the PDN disruption visualized in (2). We explore this effect on an ORCA soft-processor target running a common encryption operation.  
+
+
+\subsection{Sensor Configuration}
+The TDC delay line sensor is again implemented on a Xilinx ZYNQ XC7Z020-1CLG400C. As in Section~\ref{non_linear_behavior} both the launch and capture clock domains operate at 100 MHz and the sampling rate $F_{sample}$ is 25 MHz.  MMCM \textcircled{1} is configured to output a 100MHz clock. The sensor is placed on the FPGA fabric while remaining logically isolated from the target ORCA computation.
+
+\subsection{ORCA Soft-Processor}
+ORCA is 32 bit implementation of the RV32IM version of the RISC-V ISA. It is equipped with a four stage pipeline without instruction or data caches on bare metal, i.e., without an operating system kernel or MMU. The software it runs is a C implementation of AES-128. The core is tasked with continually running this encryption operation while reusing its key, input plain text, and initialization vector. 
+\end{comment}
+%The sensor samples for the  duration of each encryption and the resulting cipher text is compared against the expected result to verify the integrity of the computation
+%\subsection{Tuning Procedure}
+%We refine Figure~\ref{fig:capture-miss} with actual trace data gathered from the sensor co-located with the ORCA target computation. 
+
+
+
+
+
+
+
+
+
+
+\begin{comment}
+Figure~\ref{fig:capture-miss} waves (1) and (2) display a segment of a single trace, while waves (3) and (4) represent two possible configurations of $\phi$ from Figure~\ref{fig:dl-schema}. We refine this in Figure~\ref{fig:phi-orca}, where each value on the x-axis represents a different phase offset value of $\phi$ in picoseconds. We explore with the ORCA the reality of transitioning from (3), a value of $\phi$ where the sensor captures no relevant information about a co-tenant, to (4), where the sensor sample is aligned with the co-tenant's PDN side-channel leakage.
+
+%TODO - Discuss edge choice. Currently ORCA graph generated with just positive edge. 
+Figure~\ref{fig:phi-shift} shows how tuning the \name TDC to different locations of the target clock period provides different output results. The figure uses population count (popcount) as a summary statistic of a trace that relates of how far the (0 $\rightarrow$ 1) transition has propagated through the positive edge. While this acts as a useful estimate of the current state of the PDN when the sample was gathered, we also wish to understand how well a trace acts as a ``channel'' over time for information about a co-tenant. Variance within the popcount across an entire trace is used to measure how effective the trace is acting as such a ``channel.''
+%While this choice is not thoroughly evaluated in this paper, we appeal to the fact that a trace with little to no variance in edge propagation over time. Eh, could maybe try and elaborate on this choice a bit. 
+
+We vary the value of $\phi$ 13440 times in the TDC sensor co-located with the ORCA, increasing by $14.88ps$ each time for a total of $200000ps$ of offset. This shifts the $F_{sample}$ cyclically through its period of 40000ps 5 times. At each position of $\phi$ we gather a trace of $2^7$ positive-negative edge samples. The average popcount is computed on the trace, as well as the variance of the popcount across the whole trace. The average popcount becomes a single point in the red graph of Figure~\ref{fig:orca-aes} while the variance of the trace becomes a point in the blue graph. TODO - $2^7$ is weak
+
+\rk{Combine this section and the next?}
+
+\subsection{Results}
+In Figure~\ref{fig:orca-aes} we perform of sweep of $\phi$ which moves the positive edge of our sensor sample over five periods of the ORCA target computations clock. We note that after the first period of the ORCA's 25MHz clock is traversed the following four periods are identical. For this reason we will focus on the $[0ps,40000ps]$ region of Figure~\ref{fig:orca-aes}. 
+
+The importance of being able to dynamically reconfigure $\phi$ becomes immediately clear from the variance in Figure~\ref{fig:orca-aes}. For the first $17000ps$ of offset the trace exhibits little to no variance, implying that that traces gathered at these positions have little ability to capture useful information about another tenant over the duration of a trace. It is only for the next $3000ps$ of $\phi$ offset that the TDC has even the {\it potential} to capture relevant information about a co-tenant. We also note that the position variance is maximized in Figure~\ref{fig:orca-aes}, the load on the PDN is maximized (lower popcount in the red graph implies slower propagation through carry-chain).
+
+The default configuration of TDC sensors randomly assumes a value $\phi \in [0ps,40000ps]$. We have refined the design of TDC. TODO - incomplete  
+
+\end{comment}
+
+
+

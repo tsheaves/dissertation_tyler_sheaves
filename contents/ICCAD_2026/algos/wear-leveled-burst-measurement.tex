@@ -1,0 +1,19 @@
+% alg2.tex
+\begin{algorithm}[t]
+\footnotesize
+\DontPrintSemicolon
+\caption{Wear-leveled burst measurement\label{alg:burst}}
+\KwIn{Addresses $\mathcal{A}$, sequences $\mathcal{S}$, widths $\mathcal{W}$, rest fill $f$, rounds $R$}
+Write $f$ to all of $\mathcal{A}$\tcp*{initialise}
+\For{$\mathrm{round} \leftarrow 1$ \KwTo $R$}{
+    \For{$j \leftarrow 0$ \KwTo $N_{\mathrm{buf}}-1$}{
+        \ForEach{$a \in \mathcal{A}$, $\mathbf{c} \in \mathcal{S}$, $w \in \mathcal{W}$}{
+            Timed write: slots $j$ to $j{+}w{-}1$ get $\mathbf{c}$, remainder get $f$\;
+            Write $f$ to $a$\tcp*{restore}
+        }
+    }
+    \If{$\mathrm{round} < R$}{
+        Write $\bar{f}$ then $f$ to all of $\mathcal{A}$, $N_{\sigma}$ times
+    }
+}
+\end{algorithm}

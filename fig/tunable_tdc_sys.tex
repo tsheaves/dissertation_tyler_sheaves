@@ -1,0 +1,6 @@
+\begin{figure}[t!]
+\centering
+  \includegraphics[width=\linewidth]{img/tunable_tdc_intel_sys.png}
+  \caption{Intel tunable TDC voltage fluctuation sensor system architecture. The sensor core is highlighted in blue. Intel PLL reconfiguration cores replace the Xilinx MMCM enabling dynamic tuning of $\phi$ and $\theta$. All Avalon Memory-Mapped (AVMM) and Avalon Streaming (AVST) interfaces connect to the host CPU.  For characterization, a target NIOS-V (RISC-V) soft CPU core is implemented to execute a Tiny AES (AES-128) program. The target core is logically isolated and operates on a different clock domain than the voltage fluctuation sensor.}
+\label{fig:tun_tdc_sys}
+\end{figure} 

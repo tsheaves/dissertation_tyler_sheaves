@@ -1,0 +1,6 @@
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=0.99\columnwidth]{fig/images/single-word-rand-walk-clustering.pdf}
+    \Description{Histograms for the 4Mb and 8Mb write latencies measured for the random walk experiment are shown. The X-axis is the mix-max normalized write latency and the y-axis is the log-probability that a write latency is observed. Write latencies appear in three distinct distributions. Each distribution appears as a light-tailed left-skewed distribution. Histograms for \texttt{UNIPOLAR\_N}, \texttt{UNIPOLAR\_P} test vectors are overlaied and shown in different colors. The leftmost (slowest) distribution contains only \texttt{UNIPOLAR\_N}, the middle distribution contains mostly \texttt{UNIPOLAR\_P} (In the 4Mb it overlaps with  \texttt{UNIPOLAR\_N}), and the rightmost distribution for both memories contains a mixture of the two.}
+    \caption{Per-chip min-max normalized $\min \left(t_{w}\right)$ measurement histograms and ECDFs for a 1-word random unipolar walk experiment used for BREW-RC constraint generation. Clustering is performed per-chip to demonstrate reproducibility across samples. Labels are assigned either naively from applied test vector data (bottom), or from clustering performed on observed write latencies (top). \label{fig:1w-rand-walk}}
+\end{figure}

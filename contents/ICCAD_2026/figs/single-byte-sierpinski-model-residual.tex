@@ -1,0 +1,13 @@
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{img/single-byte-sierpinski-heatmaps-resid.pdf}
+    \vspace{-0.6cm}
+    \caption{
+    Single-byte, transition experiment showing a heatmap of byte transitions latencies, with an ECC-aware latency model subtracted.
+    We construct an ECC-aware timing model using techniques developed in~\cite{sheaves2026brewrc}, and subtract it from the median latencies collected in Figure~\ref{fig:sierp-orig}, $\hat{t}_{ws}-t_w$. 
+    The structural timing bias introduced by ECC are fully removed, leaving a noisy latency component.
+    This final noise can be profiled, and optimized to harvest entropy.
+    \label{fig:sierp-resid}
+    }
+    \vspace{-0.2cm}
+\end{figure}

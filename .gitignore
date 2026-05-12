@@ -1,0 +1,77 @@
+## Build output
+build/
+
+## LaTeX auxiliary files
+*.aux
+*.lof
+*.log
+*.lot
+*.fls
+*.out
+*.toc
+*.fmt
+*.fot
+*.cb
+*.cb2
+.*.lb
+
+## LaTeX bibliography
+*.bbl
+*.bcf
+*.blg
+*-blx.aux
+*-blx.bib
+*.run.xml
+*.bbl-SAVE-ERROR
+
+## LaTeX index
+*.idx
+*.ilg
+*.ind
+*.ist
+
+## LaTeX misc
+*.synctex.gz
+*.synctex(busy)
+*.pdfsync
+*.fdb_latexmk
+
+## Standalone paper build artifacts (keep sources, ignore artifacts)
+contents/DAC_2026/*.aux
+contents/DAC_2026/*.bbl
+contents/DAC_2026/*.bcf
+contents/DAC_2026/*.blg
+contents/DAC_2026/*.fdb_latexmk
+contents/DAC_2026/*.fls
+contents/DAC_2026/*.log
+contents/DAC_2026/*.out
+contents/DAC_2026/*.pdf
+contents/DAC_2026/*.run.xml
+contents/DAC_2026/*.synctex.gz
+contents/ICCAD_2026/*.aux
+contents/ICCAD_2026/*.bbl
+contents/ICCAD_2026/*.bcf
+contents/ICCAD_2026/*.blg
+contents/ICCAD_2026/*.fdb_latexmk
+contents/ICCAD_2026/*.fls
+contents/ICCAD_2026/*.log
+contents/ICCAD_2026/*.out
+contents/ICCAD_2026/*.pdf
+contents/ICCAD_2026/*.run.xml
+contents/ICCAD_2026/*.synctex.gz
+contents/TRETS_2024/*.aux
+contents/TRETS_2024/*.bbl
+contents/TRETS_2024/*.bcf
+contents/TRETS_2024/*.blg
+contents/TRETS_2024/*.fdb_latexmk
+contents/TRETS_2024/*.fls
+contents/TRETS_2024/*.log
+contents/TRETS_2024/*.out
+contents/TRETS_2024/*.pdf
+contents/TRETS_2024/*.run.xml
+contents/TRETS_2024/*.synctex.gz
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride

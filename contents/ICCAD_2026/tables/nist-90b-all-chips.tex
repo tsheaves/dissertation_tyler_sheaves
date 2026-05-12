@@ -1,0 +1,29 @@
+\begin{table}[t]
+\centering
+
+\footnotesize
+\caption{NIST SP\,800-90B Non-IID entropy estimates. (1)~Most Common Value, (2)~Collision, (3)~Compression, (4)~$t$-Tuple, (5)~LRS, (6)~Multi-MCV, (7)~Lag Prediction, (8)~MultiMMC, (9)~LZ78Y.}
+\label{tab:nist90b}
+\setlength{\tabcolsep}{3pt}
+\begin{tabular*}{\columnwidth}{@{\extracolsep{\fill}}crrrrrr}
+\toprule
+Test & \multicolumn{3}{c}{4\,Mb} & \multicolumn{3}{c}{8\,Mb} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+& RT-A & RT-B & Hot & RT-A & RT-B & Hot \\
+\midrule
+1 & 0.0074 & 0.0074 & 0.1426 & 2.9477 & 1.8743 & 2.3675 \\
+2 & 0.0074 & 0.0075 & 0.0812 & 1.0000 & 1.0000 & 1.0000 \\
+3 & 0.0004 & 0.0046 & 0.0572 & 0.5618 & 0.7271 & 0.3192 \\
+4 & 0.0060 & 0.0051 & 0.0079 & 2.8370 & 1.7358 & 2.2754 \\
+5 & 0.0142 & 0.0116 & 0.0176 & 3.7061 & 2.5852 & 3.1420 \\
+6 & 0.0074 & 0.0074 & 0.0116 & 2.9550 & 1.8786 & 2.3749 \\
+7 & 0.0094 & 0.0077 & 0.0116 & 3.6370 & 2.3875 & 3.0965 \\
+8 & 0.0074 & 0.0075 & 0.0116 & 2.9596 & 1.8753 & 2.3702 \\
+9 & 0.0074 & 0.0075 & 0.0116 & 2.9626 & 1.8769 & 2.3745 \\
+\midrule
+$\min$ & \textbf{0.0060} & \textbf{0.0051} & \textbf{0.0079} & \textbf{2.8370} & \textbf{1.7358} & \textbf{2.2754} \\
+\midrule
+$\hat{H}_{\min}$ & \textbf{0.0060} & \textbf{0.0051} & \textbf{0.0079} & \textbf{2.4973} & \textbf{1.6500} & \textbf{1.9844} \\
+\bottomrule
+\end{tabular*}
+\end{table}

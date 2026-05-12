@@ -1,0 +1,79 @@
+\section{Entropy Sources and TRNGs}
+\label{sec:bg-entropy}
+
+A \emph{noise source} is a physical process that provides
+unpredictability. An \emph{entropy source} wraps a noise source together
+with digitization and optional conditioning into a subsystem whose
+output can seed a cryptographic random bit
+generator~\cite{sonmez2016recommendation}. A true random number
+generator (TRNG) implements an entropy source in hardware. Unlike
+pseudorandom number generators, TRNGs derive randomness from physical
+entropy sources whose unpredictability is grounded in device physics
+rather than computational assumptions~\cite{sunar2007provably}.
+Dedicated entropy source circuits, such as ring oscillator jitter
+harvesters~\cite{sunar2007provably} or metastable latch
+designs~\cite{tokunaga2008true}, occupy silicon area with no secondary
+function. Entropy harvesting repurposes existing on-chip structures as
+dual-use entropy sources, amortizing the cost of entropy generation
+across components that already serve a storage or compute
+function~\cite{holcomb2009power, wang2012flash, kim2019d}.
+
+The per-sample unpredictability of a digitized noise source is
+quantified by min-entropy:
+\begin{equation}
+	\label{eq:hmin}
+	H_\infty(X) = -\log_2\!\bigl(\max_{x}\,\Pr[X = x]\bigr),
+\end{equation}
+which captures the probability of an adversary's best single guess at a
+sample value. For an 8-bit symbol alphabet, $H_\infty$ ranges from 0 (deterministic) to 8 (uniform).
+Min-entropy is a lower bound on Shannon entropy and is the standard
+measure for cryptographic entropy sources because it reflects worst-case
+predictability rather than average behavior. A raw noise source with
+$H_\infty < 1$ bit per sample is considered insufficient for direct use
+as a cryptographic entropy source without conditioning.
+
+A \emph{conditioning} component compresses the raw bitstream according
+to the estimated $\hat{H}_\infty$, concentrating source entropy into a
+shorter, near-uniform output~\cite{sonmez2016recommendation}. NIST
+SP~800-90B distinguishes between \emph{vetted} conditioning functions,
+such as SHA-256 and AES-CBC-MAC, whose entropy accounting is performed
+analytically under the assumption that the primitive behaves as an ideal
+random function, and \emph{non-vetted} functions, whose output must be
+evaluated directly by the SP~800-90B estimators. Per the SP~800-90B
+vetted conditioning requirements, $\lceil(256 + 64) /
+	H_\text{min}\rceil$ input symbols are required per 256-bit output block,
+where the 64-bit margin ensures that the conditioning output is
+full-entropy with adversarial advantage bounded by $2^{-64}$.
+
+Raw source quality is typically evaluated using the NIST SP~800-90B
+estimator suite~\cite{sonmez2016recommendation}, which applies ten
+non-parametric min-entropy estimators to a sample sequence of at least
+$10^6$ samples and reports the conservative minimum across all
+estimators. The suite includes the Most Common Value estimator, the
+Collision estimator, the Compression estimator, the t-Tuple estimator,
+the LRS estimator, and several prediction-based estimators. The minimum
+across all estimators is taken as the conservative $\hat{H}_\infty$ for
+the source. A source that fails to produce a meaningful $\hat{H}_\infty$
+estimate under SP~800-90B cannot be used as the basis of a cryptographic
+TRNG.
+
+Conditioned TRNG output is evaluated using two complementary test
+suites. NIST SP~800-22~\cite{rukhin2001statistical} applies fifteen
+frequency, serial, spectral, and complexity tests across sub-sequences
+of the conditioned bitstream. PractRand~\cite{practrand} is a streaming
+battery that evaluates at geometrically increasing data thresholds and
+is particularly sensitive to subtle correlations at small sample sizes.
+Statistical testing of conditioned output does not constitute an entropy
+proof; it serves as a sanity check that the conditioning pipeline
+functions as intended and that no large-scale structure in the raw
+source survives conditioning~\cite{sonmez2016recommendation}.
+
+The stochastic nature of resistive switching in ReRAM has motivated its
+use as an entropy source. Balatti et al.~\cite{balatti2015true} provided
+an early demonstration that cycle-to-cycle SET variability in a single
+HfO$_x$ RRAM device can serve as a TRNG. Subsequent work has explored
+both resistance-state variability and write-latency variability as
+entropy observables in commercial and embedded ReRAM
+devices~\cite{suri2018high, pang2019memristors, tolga2024trng}. The
+evaluation methodology and results for commercial COTS ReRAM entropy
+harvesting are presented in Chapter~\ref{chap:trng}.

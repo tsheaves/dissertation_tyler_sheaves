@@ -1,0 +1,116 @@
+\section{Architectural Write Latency Investigation}
+\label{sec:brewrc-investigation} This section presents a series of
+experiments that characterize the write latency behavior of commercial
+ReRAM crossbar memories. By applying carefully selected test patterns
+and analyzing the resulting write latency distributions, the memory
+array word size, polarity serialization properties, and timing
+perturbations due to embedded ECC functions are identified. These
+results motivate and directly inform the BREW-RC technique presented in
+Section~\ref{sec:brewrc-method}.
+
+\subsection{Experiment I: Redundant Write Latency}
+\label{sec:brewrc-exp1} In a crossbar-based architecture, the word size
+of the memory array is the smallest unit that can be serialized through
+the write path, and is therefore the natural choice for the ECC encoder
+data word width $k$. The target memories allow 1--256\,B write
+operations, but the physical word size is not disclosed in the device
+specification. To infer $k$, the latency characteristics of redundant
+write operations are used. A \emph{redundant write} reinforces the
+existing logical state of ReRAM cells; because no transitions occur, the
+write latency reflects the minimum $t_w$ and the fixed per-word
+programming overhead of the controller. This makes redundant writes a
+low-noise probe of write-path serialization granularity. Redundant
+writes with burst sizes of 1--256\,B are performed on 10 randomly
+selected 256\,B-aligned addresses. A 256\,B contiguous memory segment
+$S$ is first programmed to a random initial state. For each byte
+position $i_B$ within $S$, an $i_B$-byte redundant write is performed.
+\input{contents/DAC_2026/fig/figures/burst_redundant_line}
+Figure~\ref{fig:red-scan} shows the combined write latencies (mean and
+shaded 95\% confidence interval) for all samples and test addresses. For
+each 4M (8M) sample, $t_w$ overheads are accrued every two (four)
+byte-lengths and show almost no variance, demonstrating that
+serialization occurs on 2\,B (4\,B) boundaries. This result indicates
+$k_{4M}=16$ bits and $k_{8M}=32$ bits, providing one dimension of the $k
+	\times r$ parity submatrix.
+
+\subsection{Experiment II: Single-Bit Transitions, Uniform Init}
+
+\label{sec:brewrc-exp2}
+
+Single-bit transitions may exhibit data-dependent $t_w$ if asymmetries
+exist in the switching dynamics of the ReRAM cells or the PV loop. This
+experiment characterizes single-bit write latency in uniformly
+initialized 256\,B segments $S$, where all non-transitioning bits are
+set to a uniform logical state. Each 256\,B span is initialized to
+$S=\mathbf{0}$ (all zeros) or $S=\mathbf{1}$ (all ones). Each bit
+position $i_b$ in the 2048-bit span is toggled 10 times in both logical
+polarities and write latencies are captured. Because the minimum write
+size in both memories is 1\,B, the byte offset and target bit are
+computed from $i_b$ and two 1-byte write latency measurements are
+performed.
+
+\input{contents/DAC_2026/fig/figures/bit_transition_buffer_scan_heat_strip}
+
+Figure~\ref{fig:1b-buff-scan} shows the resulting $t_w$ distributions
+for each chip. Each bar represents a log-scaled collapsed histogram
+combining all bit positions and addresses for one polarity, initial
+state, and chip. For the 4M, write latency distributions for each
+polarity overlap but are distinguishable. For the 8M, distributions for
+each polarity are separated by a large margin. These relationships are
+preserved across all samples of both devices, demonstrating that
+single-bit transitions produce data-dependent write latency
+distributions.
+
+\subsection{Experiment III: Single-Bit Transitions, Non-Uniform Init}
+\label{sec:brewrc-exp3} ECC parity bit transition polarities depend on
+the state of the data word $d$. This experiment demonstrates that the
+logical state of non-transitioning bits within the same word boundary
+can influence the $t_w$ distribution of a transitioning bit, providing
+evidence of parity bit activity. Ten 256\,B-aligned addresses are
+randomly selected. From each address, a 256\,B span is initialized to
+all zeros ($S=\mathbf{0}$). The first bit in each segment is designated
+as the measurement bit. Before each measurement sequence, a contiguous
+subset of neighboring bits extending from the measurement bit is
+inverted ($S[1:i]=S'=\mathbf{1}$), creating a locally non-uniform
+initial state. Each measurement bit is toggled 10 times per
+configuration, with span sizes $i$ ranging from 1 to 2047 bits.
+\input{contents/DAC_2026/fig/figures/bit_sensitivity_scan_heat_strip}
+The results are shown in Figure~\ref{fig:sensitivity-scan}. Two key
+observations are made. First, beyond the word size established in
+Experiment~I, the write latency distribution stabilizes: the influence
+of neighboring bit states on write latency ends at the logical word
+boundary. Second, while the span of $S'$ is smaller than the word
+boundary, single-bit writes exhibit substantially longer latencies than
+those observed under uniform initialization. These elevated latencies
+are consistent with parity bit activity in the opposing polarity to the
+transitioning data bit, causing codeword-level polarity serialization.
+
+\subsection{Experiment IV: Single-Byte Transitions, Uniform Init}
+\label{sec:brewrc-exp4} This experiment measures $t_w$ for all possible
+($2^{16}$) single-byte transitions on all 4M and 8M samples, linking
+write latency cluster membership to unipolar and bipolar codeword
+transitions. This experiment is similar to the 1-byte latency
+characterization performed in~\cite{tolga2024trng}, where the 4M device
+was evaluated as an entropy source for TRNGs. It is repeated here with
+one extension: the state of all inactive bytes in the word is varied,
+setting them to either all 1s or all 0s, to exercise the full dataword.
+For each chip, measurements are performed on 10 word-sized segments. To
+suppress the effect of rare long-tailed latency events, the minimum
+$t_w$ ($t_{wmin}$) is taken for each byte transition across all
+segments.
+\input{contents/DAC_2026/fig/figures/sierpinski-clustering-mixture-curves}
+Figure~\ref{fig:sierp-hist} shows the results for the 4M and 8M. Three
+unique $t_w$ distributions are observed for the 4M and four for the 8M.
+The minimum $t_w$ distribution is exclusively occupied by redundant
+write operations. Bipolar dataword transitions always occupy the highest
+$t_w$ distribution. Unipolar dataword transitions occupy either an
+intermediate $t_w$ distribution or the highest $t_w$ distribution. For
+the 4M, unipolar transitions occupying the intermediate distribution
+overlap. For the 8M, two distinct intermediate distributions exist, each
+occupied by transitions of a single polarity. These observations are
+consistent with~\cite{tolga2024trng}. The observation that certain
+unipolar dataword transitions occupy the bipolar timing distribution
+confirms that underlying parity bit activity modifies the codeword DHD,
+causing polarity serialization. The cluster membership of each
+transition is determined by the codeword DHD, not the dataword DHD
+alone.

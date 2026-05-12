@@ -1,0 +1,103 @@
+\section{Commercial ReRAM and Timing Side-Channels}
+\label{sec:motivation}
+
+\subsection{Commercial ReRAM Deployment}
+Resistive random-access memory (ReRAM) refers to a class of non-volatile
+memory technologies that store data by modulating the electrical
+resistance of a switching layer. The most commercially mature variant is
+oxide-based ReRAM (OxRAM), which places a metal oxide switching layer
+between two electrodes and is CMOS compatible, enabling back-end-of-line
+integration in standard semiconductor processes~\cite{wong2012metal}.
+Unlike conventional flash memory, OxRAM offers low read latency,
+fine-grained addressability, and compatibility with standard CMOS
+processes~\cite{chenReRAMHistory2020}. These properties have driven its
+adoption as embedded data storage in low-power microcontrollers, edge
+computing platforms, and radiation-tolerant systems for aerospace and
+defense applications. In the last decade, several commercial ReRAM
+products have entered mass production, making deployed devices widely
+accessible~\cite{fujreram4M, fujreram8M, rxreram12M, nuvotonML23}.
+Writing a value to a ReRAM cell involves growing or rupturing the CF
+within the switching layer through a sequence of voltage
+pulses~\cite{yu2016resistive, kawahara2013filament}. Because filament
+formation and rupture are stochastic processes~\cite{6582090, 6724732},
+commercial architectures rely on a program-verify (PV) loop that
+iteratively applies programming pulses and checks cell resistance until
+the desired state is confirmed~\cite{kawahara2013filament}. The duration
+of each PV loop is non-deterministic and depends on the physical state
+of the cell being programmed. This cycle-to-cycle variability in write
+latency is an observable property of the device that carries information
+about its internal state.
+
+\subsection{Timing Properties and Security Primitives}
+The stochastic nature of ReRAM switching has attracted interest beyond
+data storage. Prior works have proposed exploiting write latency
+variability as an entropy source for hardware security primitives,
+including true random number generators (TRNGs) and physically
+unclonable functions (PUFs)~\cite{balatti2015true, jiang2017novel}.
+TRNGs provide the unpredictable seeds required by cryptographic
+protocols, and PUFs provide device-unique identifiers that resist
+cloning. The availability of commercial ReRAM in low-power embedded
+platforms makes it an attractive candidate for dual-use entropy
+harvesting, amortizing the cost of entropy generation across a component
+already serving a storage function. Commercial ReRAM devices implement
+error-correcting codes (ECCs) to improve
+reliability~\cite{hayakawa2017resolving, crafton2021cim}. Write
+operations in crossbar arrays are subject to strict sequencing
+constraints~\cite{xu2015overcoming}; the crossbar architecture requires
+SET and RESET operations to be serialized when they occur within the
+same word. ECC parity bits computed over user data introduce additional
+cell transitions on every write, determined by the codeword rather than
+the user-visible data alone. These transitions are invisible to the user
+but contribute to the write latency of every operation. The effect of
+ECC switching on write latency is not predictable without full knowledge
+of the underlying code. ECCs are considered vendor secrets, and their
+designers do not typically consider timing leakage as a design concern.
+
+\subsection{ReRAM Timing Leakage Channels}
+The stochastic PV loop and the deterministic ECC parity activity
+together produce structured write latency distributions that carry
+information about internal device state and embedded device
+architecture. These distributions constitute timing leakage channels:
+observable signals that correlate with information the device does not
+intentionally expose. Prior investigations of commercial ReRAM timing
+identified structured variance in these distributions but could not
+explain or model it~\cite{suri2018high, tolga2024trng}. The root cause,
+undocumented ECCs dominating the observable timing signal, was not
+identified. This gap has practical consequences. Without knowledge of
+the embedded ECC, empirical timing models are inaccurate, conflating
+deterministic parity activity with stochastic device physics. Security
+analyses of timing side-channels in crossbar memories have overlooked
+the dominant contributor to write latency
+variance~\cite{khan2021comprehensive, kommareddy2019crossbar,
+	wang2023side, krautter2022data}. Entropy claims for ReRAM-based TRNGs
+are overstated, as structured ECC perturbations are mistaken for true
+device stochasticity. The timing side-channel attack surface of
+commercial ReRAM products cannot be fully characterized without first
+recovering these hidden architectural features.
+
+\subsection{Research Gaps}
+\label{sec:research_gaps_and_motivation} The only existing technique for
+bit-exact ECC recovery from a commercial memory product is
+BEER~\cite{patel2020bit}, which targets DRAM by exploiting data
+retention failures that expose ECC corrections through direct readback.
+Commercial ReRAM products do not support this mechanism; the PV loop
+ensures every write converges to the target state, preventing the
+retention-based error injection that BEER relies upon, and parity bits
+are not directly readable. Physical reverse engineering of commercial
+ReRAM has been demonstrated using conductive-probe atomic force
+microscopy~\cite{tay2023afm}, but this approach is destructive, costly,
+and impractical outside a laboratory setting. No non-invasive technique
+for recovering the ECC of a commercial ReRAM product exists. With
+knowledge of the underlying ECC, accurate codeword-level timing models
+become realizable, the stochastic component of write latency can be
+isolated and rigorously characterized as an entropy source, and the
+timing side-channel attack surface of commercial ReRAM products can be
+fully analyzed for the first time.
+
+\subsection{Thesis Statement}
+\label{sec:thesis_statement} The write latency of commercial ReRAM
+devices is dictated by undocumented architectural features that are
+recoverable through non-invasive timing analysis. Knowledge of these
+features is necessary for accurate timing models, rigorous entropy
+characterization, and reasoning about the timing side-channel attack
+surface of commercial ReRAM products.

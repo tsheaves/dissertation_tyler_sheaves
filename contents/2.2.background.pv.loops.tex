@@ -1,0 +1,44 @@
+\section{Program-Verify Loops and Write Latency}
+\label{sec:bg-pvloops}
+
+Because OxRAM switching is stochastic, a single programming pulse cannot
+reliably bring a cell to a target resistance state. Commercial
+architectures therefore employ a program-verify (PV) loop: a sequence of
+programming pulses interleaved with resistance measurements that
+continues until the cell resistance falls within a target
+window~\cite{kawahara2013filament, milo2021accurate}. Each iteration of
+the loop applies a pulse and checks the result; if the cell has not
+reached the target state, another pulse is applied. The loop terminates
+when the cell resistance is confirmed to be within specification.
+Single-level cells (SLCs) define two resistance windows corresponding to
+logical 0 and 1, while multi-level cells (MLCs) require finer resistance
+windows and more sophisticated verification schemes~\cite{hung2021mlc}.
+
+The completion time of a PV loop, and therefore the write latency $t_w$
+of the device, is non-deterministic. Two sources of variability
+contribute to $t_w$. The stochastic component arises from cycle-to-cycle
+variability in filament switching dynamics~\cite{6582090, 6724732}: the
+number of pulses required to grow or rupture a filament varies even
+under identical initial conditions. The deterministic component arises
+because the number of PV iterations required to reach the target
+resistance scales with the distance between the initial cell resistance
+and the target threshold~\cite{yu2012switching, kawahara2013filament}. A
+transition originating far from the target requires more programming
+pulses than one originating near it. Together, these contributions make
+write latency a function of both the stochastic device physics and the
+logical state being written.
+
+The data-dependence of write latency has direct implications for timing
+side-channel analysis. Writes that require only SET transitions, only
+RESET transitions, or no transitions at all produce different latency
+distributions~\cite{yu2012switching}. In a crossbar architecture, writes
+that require both SET and RESET transitions within the same word incur
+additional serialization overhead, as described in
+Section~\ref{sec:bg-crossbar}. The presence of an on-die ECC further
+modifies the effective transition composition of every write, since
+parity bits computed over user data may require transitions that differ
+in polarity from the data transitions. The net result is that the write
+latency of a commercial ReRAM device encodes information about the
+codeword being written, not merely the user-visible data word. This
+relationship is the basis of the BREW-RC technique presented in
+Chapter~\ref{chap:brewrc}.

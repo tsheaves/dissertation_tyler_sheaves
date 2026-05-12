@@ -1,0 +1,261 @@
+%\ifcamready
+%\else
+%\makeatletter
+%\def\@copyrightspace{}
+%\makeatother
+%\fi
+
+%\usepackage[usenames]{color}
+%\usepackage{svg}
+%\definecolor{linkcol}{rgb}{0,0,0}
+%\definecolor{citecol}{rgb}{0,0,0}
+%\definecolor{urlcol}{rgb}{0,0,0.75}
+%\usepackage{amssymb,amsfonts,amsmath}
+%\usepackage{amssymb}% http://ctan.org/pkg/amssymb
+%\usepackage{pifont}% http://ctan.org/pkg/pifont
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\usepackage{rotating}
+%\usepackage{amsfonts,amsmath}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage[noend]{algpseudocode}
+%\usepackage{amsmath}
+\usepackage{wasysym}
+\usepackage{adjustbox}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{graphicx}
+%\usepackage{times}
+\usepackage{pifont}
+\usepackage{wrapfig}
+%\usepackage[hyphens]{url}
+%\usepackage{verbatim}
+\usepackage{footnote}
+
+%\usepackage{rotating}
+%\usepackage{multirow}
+%\usepackage{enumitem}
+%\usepackage{Sweave}
+%\usepackage{balance}
+%\usepackage{flushend}
+% \usepackage{subfigure}
+\usepackage{subfig}
+%%%%%%%%Moh packages
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
+%\usepackage{mathtools}  
+%\usepackage{amsmath}
+%\usepackage{amssymb}
+\usepackage{tabulary}
+\usepackage{float}
+\usepackage[section]{placeins}
+%\usepackage{hyperref}
+\usepackage{listings}
+\newcommand{\squeezeup}{\vspace{-2.5mm}}
+\usepackage{tcolorbox}
+\usepackage{soul}
+\usepackage{enumerate}
+\usepackage{seqsplit}
+\tcbuselibrary{breakable}
+\usepackage{mdframed}
+\usepackage{textcomp}
+\usepackage[normalem]{ulem}
+%\usepackage{url}
+%\usepackage{hyperref}
+%\hypersetup{
+%    colorlinks=false,
+%    pdfborder={0 0 0},
+%}
+\usepackage{relsize}
+%\renewcommand*{\UrlFont}{\ttfamily\smaller\relax}
+%%%%%%%%
+%\setlength{\skip\footins}{6pt}
+
+%%%%%% network diagram stuff
+\usepackage{makecell}
+\usepackage{bytefield}
+\usepackage{pgf-umlsd}
+\usepackage{tikz}
+\usetikzlibrary{
+arrows,
+shadows,
+calc,
+positioning,
+shapes,
+decorations.pathreplacing
+}
+\tikzset{
+short/.style={draw,rectangle,text height=3pt,text depth=13pt,
+  text width=7pt,align=center,fill=gray!30},
+long/.style={short,text width=1.5cm}
+}
+%%%%%%
+
+% USENIX packages
+\usepackage{xspace}
+%\usepackage{cite}
+%%%%%%%%%%%%%%%%%
+
+%\newcommand{\red}[1]{\textcolor{red}{#1}}
+%\newcommand{\blue}[1]{\textcolor{blue}{#1}}
+
+%%%%keyword terms so that we can easily change them if needed.
+\newcommand{\sensor}{voltage fluctuation sensor\xspace}
+\newcommand{\Sensor}{Voltage fluctuation sensor\xspace}
+\newcommand{\sensors}{voltage fluctuation sensors\xspace}
+\newcommand{\Sensors}{Voltage fluctuation sensors\xspace}
+\newcommand{\name}{Tunable Dual-Polarity\xspace}
+
+\definecolor{notecolor}{rgb}{0.75,0,0} % A darker red
+\newcommand{\note}[1]{{\textcolor{notecolor}{[\textit{#1}]}}}
+
+\newcommand{\moh}[1]{\note{#1 --MR}}
+\newcommand{\dm}[1]{\note{#1 --DM}}
+\newcommand{\slb}[1]{\note{#1 --SLB}}
+\newcommand{\pp}[1]{\note{#1 --Paul}}
+\newcommand{\rk}[1]{\note{#1 --Ryan}}
+\newcommand{\dr}[1]{\note{#1 --Dustin}}
+\newcommand{\mg}[1]{\note{#1 --Mustafa}}
+\newcommand{\cd}[1]{\note{#1 --Colin}}
+\newcommand{\ow}[1]{\note{#1 --Liv}}
+
+
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\renewcommand{\ttdefault}{cmtt} % Use CMtt font instead of Courier.
+
+%\usepackage[bookmarks=true,%
+%	bookmarksnumbered=true,%
+%	colorlinks=true,%
+%	linkcolor=linkcol,%
+%	citecolor=citecol,%
+%	urlcolor=urlcol,%
+%	hypertexnames=true,%
+%	pdfpagelabels]{hyperref}
+
+% Christian's magic space-saving stuff.
+% http://www-h.eng.cam.ac.uk/help/tpl/textprocessing/squeeze.html
+%
+
+\renewcommand\floatpagefraction{.9}
+\renewcommand\topfraction{.9}
+\renewcommand\bottomfraction{.9}
+\renewcommand\textfraction{.1}
+\setlength{\parskip}{0em}
+\frenchspacing
+
+% Figure negative spacing
+\newcommand\floatspace{\vspace{-0.125in}}
+% Kirill's dainty list environments.
+
+\newenvironment{prettylist}{
+	\begin{list}{
+		\footnotesize\raisebox{0pt}{\scriptsize\ding{118}}
+	}{
+		\setlength\topsep{0.5ex}
+		\setlength\leftmargin{16pt}
+		\setlength\rightmargin{0pt}
+		\setlength\itemsep{1pt}
+		\setlength\parskip{0pt}
+		\setlength\parsep{0pt}
+		\setlength\itemindent{0pt}
+	}
+}{
+	\end{list}
+}
+
+% col name
+\newcommand\colname[1]{\textit{#1}}
+\newcommand\rowgrpname[1]{\textbf{#1}}
+
+% Fine-tuning for table spacing. --cpk
+\def\TblSpT{\rule[-1ex]{0pt}{0pt}}
+\def\TblSpB{\rule{0pt}{2.5ex}}
+
+% Sectioning
+
+% ...
+
+% Et al.
+
+\newcommand\etal{\emph{et al.}}
+
+\def\blackI{\ding{182}}
+\def\blackII{\ding{183}}
+\def\blackIII{\ding{184}}
+\def\blackIV{\ding{185}}
+\def\blackV{\ding{186}}
+\def\blackVI{\ding{187}}
+\def\blackVII{\ding{188}}
+\def\blackVIII{\ding{189}}
+
+\let\oldthebibliography=\thebibliography
+  \let\endoldthebibliography=\endthebibliography
+  \renewenvironment{thebibliography}[1]{%
+    \begin{oldthebibliography}{#1}%
+      \setlength{\parskip}{0ex}%
+      \setlength{\itemsep}{0ex}%
+  }%
+  {%
+    \end{oldthebibliography}%
+  }
+
+% We define two orthogonal conditionals, "draft" and "camready". During
+% paper preparation, "draft" should be set to true using the \drafttrue
+% command in paper.tex. For camera-ready submission, "camready" should
+% be set to true using the \camreadytrue command in paper.tex.
+
+% For notes to authors. These are only enabled for draft versions. In
+% non-draft versions \note does nothing.
+
+%\ifdraft
+
+%\definecolor{notecolor}{rgb}{0.75,0,0} % A darker red
+%\newcommand{\note}[1]{{\textcolor{notecolor}{[\textit{#1}]}}}
+%\else
+%\newcommand{\note}[1]{}
+%\fi
+
+\newcommand{\notefor}[2]{\note{\textbf{#1:} #2}}
+\newcommand{\noteby}[2]{\note{#2 ---#1}}
+
+
+\makeatletter
+
+\renewcommand\paragraph[1]{%
+\@startsection{paragraph}{4}{\z@}%
+{-0.1ex plus 0.01ex}{-0.1em}%
+{\normalfont\normalsize\bfseries}{#1}}
+
+%\renewcommand\section{%
+%\@startsection{section}{1}{\z@}%
+%{-1.25ex plus -0.5ex minus -.2ex}%
+%{0.75ex plus .25ex}%
+%{\reset@font\large\bfseries}}
+%
+%\renewcommand\subsection{%
+%\@startsection{subsection}{2}{\z@}%
+%{-1.25ex\@plus -0.5ex \@minus -.2ex}%
+%{0.5ex \@plus .2ex}%
+%{\normalfont\large\bfseries}}
+%
+%\renewcommand\subsubsection{%
+%\@startsection{subsubsection}{3}{\z@}%
+%{-0.75ex\@plus -0.25ex \@minus -.25ex}%
+%{0.25ex \@plus .2ex}%
+%{\normalfont\normalsize\bfseries}}
+
+\makeatother
+
+% Identify overfull lines
+
+%\ifdraft
+%\overfullrule=0.1cm
+%\fi
+
+%\ifcamready
+%\clubpenalty=10000
+%\widowpenalty = 10000
+%\fi

@@ -1,0 +1,34 @@
+% \chapter{Toward ReRAM Pentimenti}
+
+% Recent work in hardware side-channel analysis has identified the
+% existence of a class of unique timing leakage channells called FPGA
+% Pentimenti. Fundamentally, these side-channel attacks leak the prior
+% state of FPGA routing logic via high precision progagation delay
+% measurement. These measurements capture extremely minute propagation
+% delay drift due to bias temperature instability (BTI) stress and
+% recovery. The key realization is that recovery is assymetric depending
+% on a prior stress regime. Therefore, an adversary who occupies an FPGA
+% resource after a victim, need only identify if a route on the FPGA is
+% in a recovery 0, or recovery 1 state to determine if a route was held
+% under a constant bias for a prolonged period by the prior user. While
+% practical applications of these leakage channels are an area of active
+% research, the leakage of any information between isolated users or
+% processes (both spatial and temporal) violates key isolation
+% requirements assumed in secure confidential computing infrastructure.
+
+% FPGA Pentimenti represents a significant achievement as it is the first
+% side channel to exploit defect drift as an information leakage channel.
+% These temporal side channels are a cause for concern as isolation
+% gaurantees between subsequent users of hardware resources are
+% conventionally only enforced through logical erasure. Therefore,
+% phenomena that leak information through device states that persist
+% after logical erasure are considered Pentimenti. ReRAM devices are
+% known to be suceptible to many such phenomena. In this chapter we
+% contrast ReRAM defect dynamics which may persist beyond logical erasure
+% with that of FPGA routing resources. We then demonstrate several
+% results that indicate that ReRAM defect drift is detectable despite the
+% extremely low measurement resolution available in existing commercial
+% ReRAM devices. We conclude by presenting several reasonable scenarios
+% in which defect dynamics may become a
+
+% Fundamentally FPGA Pentimenti on routing resources take advantage of

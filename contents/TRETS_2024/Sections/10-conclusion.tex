@@ -1,0 +1,35 @@
+%\vspace{-5pt}
+\section{Conclusion}
+\label{conclusion}
+%\vspace{-5pt}
+%Side-channel leakage poses a major security threat in multi-tenant FPGA environments. A tenant can instantiate a voltage fluctuation sensor, within their region of the FPGA, that measures minute changes in the shared power distribution network (PDN), to potentially recover cryptographic keys. Prior work remains deficient in two significant ways: 
+
+%First, FPGA multitenant side-channel attacks often presuppose when and what co-tenant computation is running before a key recovery attack can be performed. And existing voltage fluctuation sensor architectures leave much on the table in terms of signal recovery from a leaky co-tenant. 
+
+We present the \name TDC, which enables a first of its kind pipeline for recognizing co-tenant computation, maximizing recovered leaked information, and effectively extracting confidential information from a victim co-tenant. We show that the \name TDC can be implemented on both Xilinx and Intel FPGA systems. To maintain the fine resolution provided by the Xilinx MMCM we provide a novel PLL configuration prepossessing algorithm that filters the space of all possible PLL configurations to compile sets of course-grained phase steps that can be aggregated to implement fine-grain phase sweeps of our tuning parameters. In a classification experiment with 13 applications, our techniques yield an 80\% classification accuracy on 5-board, leave-one-out cross-validation, a 2.5$\times$ improvement over prior work. In addition, our sensor and tuning methodology improves the rate at which all correct subkey values are ranked as most likely by 2.2$\times$ in a CPA attack. 
+%\dr{Grammatical error. Last sentence needs to be re-written. Would be good to grab the $\times$ from figure 8.}
+
+%\section{Acknowledgements}
+% % \vspace{-10pt}
+% \begin{verbatim}
+\begin{acks}
+This material is based upon work supported by the National Science Foundation Graduate Research Fellowship Program under Grant No. DGE-2038238. 
+Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
+\end{acks}
+% \end{verbatim}
+
+%Our work fills a significant void by demonstrating that it is possible to identify the type of computation as well as microarchitectural implementation of a co-tenant's computation. 
+
+
+
+%We presented the design of a \name TDC, capable of capturing rising and falling transitions, with adjustable sample window, duration, phase, and frequency. We  demonstrated that parameter selection, dynamic tuning, and noise reduction is essential for mitigating non-linear behaviors within TDC sensors, extracting information about a co-tenant computation, and improving cross-board generalization. 
+%We measure the impact of these techniques in a multi-tenant scenario where the attacker aims to determine the type of computation %(AES, PRESENT, Ring-Oscillator, Arithmetic-Heavy, and No-Sensor) 
+%and microarchitectural implementation %(Microblaze, ORCA, PicoRV32, and CortexM3)
+%of a co-tenant. This serves as a necessary precursor for exploits in a virtualized FPGA environment, where an attacker must identify a co-located application before performing an attack.
+%Our results show that 13-way classification accuracy on 5-board, leave-one-out cross-validation can be improved by 2.5$\times$, from 32\% to 80\% and that noise reduction techniques reduce the interquartile range of cross-validation loss by 5.8$\times$.
+%Finally, after identifying an AES computation with our classification network, we demonstrate that proper sensor calibrations increases the frequency with which all correct subkey values are ranked as most likely by 2$\times$ in a Correlation Power Analysis attack.
+
+%We presented the design of a \name TDC, capable of capturing rising and falling transitions, with adjustable sample window, duration, phase, and frequency. These features allow us to adjust the underlying structural limitations of TDCs and optimize measured information. Our analysis explored three different methods for measuring propagation within the TDC and concluded that Hamming distance is most sensitive to computations of a co-tenant. Then, we explored how the tuning phase relationship between the \name TDC and the co-tenant clock can improve measured informatiion. Finally, as a practical measure of the side-channel information gained with our sensor and its proper calibration, we showed the accuracy in distinguishing between co-tenants in a 13-way classification can be improved by 2.7$\times$ using the appropriate tuning parameters.
+%\dr{Add IQR statement}
+%\dr{TODO: Check side-channel/side channel consistency}
+\newpage

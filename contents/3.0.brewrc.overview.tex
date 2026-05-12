@@ -1,0 +1,27 @@
+\label{chap:brewrc}
+
+Commercial ReRAM memories implement undocumented error-correcting codes
+that impose deterministic, polarity-dependent timing perturbations on
+every write operation. These perturbations dominate the observable write
+latency distributions of deployed devices, yet no non-invasive technique
+existed to recover the underlying ECC structure prior to this work. This
+chapter presents BREW-RC (Bit-exact Recovery of ECC from Write Timing in
+ReRAM Crossbars), a technique that recovers the bit-exact ECC parity
+submatrix of a commercial ReRAM memory using only write-access timing,
+without physical probing or device modification. The chapter makes three
+contributions. First, it identifies and experimentally characterizes an
+undocumented timing side-channel in commercial ReRAM devices arising
+from ECC parity-bit switching activity. Second, it introduces BREW-RC,
+which formulates ECC recovery as a SAT problem whose constraints are
+derived from the polarity structure of observed write latency
+distributions. Third, it demonstrates that the recovered parity
+submatrix accurately predicts write-latency distributions in commercial
+devices, enabling precise timing models for side-channel analysis and
+reliability characterization. Section~\ref{sec:brewrc-setup} describes
+the experimental platform and measurement methodology.
+Section~\ref{sec:brewrc-investigation} presents a series of
+architectural write latency experiments that characterize the timing
+side-channel and motivate the BREW-RC approach.
+Section~\ref{sec:brewrc-method} presents the BREW-RC technique in
+detail. Section~\ref{sec:brewrc-results} presents timing model
+construction and validation results.

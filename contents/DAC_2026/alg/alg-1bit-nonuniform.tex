@@ -1,0 +1,16 @@
+\begin{algorithm}[b!]
+\footnotesize
+\caption{1-bit, non-uniform $\mathrm{S}$, test pattern generation \label{alg:sensitivity}}
+\begin{algorithmic}[1]
+\State $N_{\text{ADDRS}} \gets 10$
+\State $A \gets$ rand\_sample(align\_256B(addresses), $N_{\text{ADDRS}}$)
+\State $\mathrm{S} \gets \mathbf{0}$
+\ForAll{address \textbf{ in } $A$}
+    \State $L \gets$ shuffle(range(1, 2047))
+    \ForAll{$s$ \textbf{ in } $L$}
+        \State $\mathrm{S}' \gets$ initialize\_$\mathrm{S}'$($\mathrm{S}$, $s$) \Comment{1, 256-byte write op}
+        \State toggle\_bit\_0\_twice($\mathrm{S}'$) \Comment{2, 1-byte write ops}
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}

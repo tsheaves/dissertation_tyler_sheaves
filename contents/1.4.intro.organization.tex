@@ -1,0 +1,39 @@
+\section{Dissertation Organization}
+
+\label{sec:organization} This dissertation is organized into the
+following chapters.
+
+\textbf{Chapter~\ref{chap:background}} provides technical background on
+the device and architectural behaviors that determine write latency in
+commercial ReRAM crossbar memories, including OxRAM bipolar switching
+dynamics, program-verify loops, crossbar array architecture, and linear
+block codes.
+
+\textbf{Chapter~\ref{chap:brewrc}} presents BREW-RC, the first
+non-invasive technique to recover the bit-exact ECC parity submatrix
+from commercial ReRAM using write-access timing. It describes the
+experimental characterization of write latency on two commercial
+products, the SAT-based formulation of ECC recovery, and a validation of
+the recovered parity matrix against destructive reverse engineering
+results.
+
+\textbf{Chapter~\ref{chap:trng}} applies the structural understanding
+developed in Chapter~\ref{chap:brewrc} to the characterization of
+stochastic write latency in commercial ReRAM. It demonstrates that prior
+entropy claims are overstated due to unaccounted ECC activity, presents
+an ECC-aware framework for entropy source construction and evaluation,
+characterizes the effects of device aging on entropy yield, and
+demonstrates a TRNG achieving 17$\times$ throughput improvement over
+prior methods.
+
+% \textbf{Chapter~\ref{chap:remanence}} connects the timing channels
+% characterized in this dissertation to the broader class of hardware
+% security threats that exploit physical device state. It reviews FPGA
+% Pentimenti as the most developed instance of this class, identifies the
+% open research challenges specific to ReRAM data remanence, and
+% discusses what the contributions of this dissertation enable and what
+% remains to be demonstrated.
+
+\textbf{Chapter~\ref{chap:conclusion}} summarizes the contributions of
+this dissertation, reflects on the implications for the security of
+deployed ReRAM products, and identifies directions for future work.

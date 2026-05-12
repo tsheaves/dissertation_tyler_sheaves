@@ -1,0 +1,26 @@
+\section{Experimental Setup}
+\label{sec:brewrc-setup}
+
+\input{fig/experimental_setup.tex}
+
+The experiments in this chapter are performed on four samples each of
+two ReRAM products from RAMXeed (formerly Fujitsu Semiconductor Memory
+Solutions Ltd.). Device specifications are listed in
+Table~\ref{tab:reram_spec}.
+
+\input{contents/DAC_2026/tab/ramxeed_device_comparison}
+
+Each experiment collects write latencies $t_w$ corresponding to a set of
+applied test vectors. Each write is committed to the device over a SPI
+interface by de-asserting chip-select following the last byte of a
+\texttt{WRITE} operation. $t_w$ is measured from the time the write
+transaction is committed to the time the write-in-progress (WIP) bit of
+the STATUS register is cleared. Measurements of $t_w$ are quantized by
+the minimum time required to check for write completion ($\Delta t$),
+which is defined as the time between successive read status register
+(RDSR) operations:
+\begin{equation}
+	\Delta t = \frac{8}{f_{SPI}}.
+\end{equation}
+The RDSR can be polled continuously by holding chip-select while driving the SPI clock; the status register is returned every 8 SPI clock cycles. SPI interfaces are operated at the maximum frequency defined in the device specification. The minimum $\Delta t$ of the MB85AS4MT and MB85AS8MT memories are therefore $1.6\,\mu$s and $0.8\,\mu$s, respectively.
+SPI transactions are applied and timed using a Terasic DE10-Nano Cyclone V SoC FPGA development kit. For each write operation, a hardware counter on the FPGA captures $t_w$ and pushes it to a response FIFO. The FPGA is used primarily to scale experiments across multiple device samples in parallel. Prior works have demonstrated equivalent timing capabilities using microcontrollers~\cite{tolga2024trng, ferdaus2024hiding}.

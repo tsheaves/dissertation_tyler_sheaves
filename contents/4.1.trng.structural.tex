@@ -1,0 +1,46 @@
+\section{Structural Timing Bias and ECC Removal}
+\label{sec:trng-structural}
+
+\subsection{Experimental Platform}
+The experiments in this chapter use the same experimental platform
+described in Section~\ref{sec:brewrc-setup}: two MB85AS4MT (4M) and two
+MB85AS8MT (8M) standalone ReRAM modules connected to a DE10-Nano FPGA
+development kit via SPI. Write latency measurements are captured using
+the same hardware timer and WIP polling methodology. The ECC parity
+submatrices $P_{4M}$ and $P_{8M}$ recovered in Chapter~\ref{chap:brewrc}
+are used throughout.
+
+\subsection{Sierpinski Structure and ECC Activity}
+
+\input{contents/ICCAD_2026/figs/single-byte-sierpinski.tex}
+
+\input{contents/ICCAD_2026/figs/single-byte-sierpinski-model-residual.tex}
+
+Arul et al.~\cite{tolga2024trng} identified a Sierpinski-like pattern in
+single-byte transition latency heatmaps of the MB85AS4MT and attributed
+it to the bit-level polarity structure of data transitions. The
+experiments in Chapter~\ref{chap:brewrc} (Section~\ref{sec:brewrc-exp4})
+reproduce this pattern and demonstrate that it arises from ECC parity
+switching activity rather than data polarity alone. This section
+confirms this attribution by constructing an ECC-aware timing model and
+subtracting its predictions from measured latencies. Each chip is
+initialized to a global bit state, $G=\mathbf{0}$ or $G=\mathbf{1}$.
+Each byte under test is exhaustively transitioned from every initial
+value to every final value. Each FROM/TO transition is repeated 10 times
+and the experiment is performed on all byte positions in 10 randomly
+selected words, on three modules each of 4M and 8M density.
+
+Figure~\ref{fig:sierpinski} (top) reproduces the Sierpinski-like pattern
+on both 4M and 8M devices, extending the result of~\cite{tolga2024trng}
+to the 8M for the first time. The ECC-aware timing model
+$\hat{t}_w(\delta)$ (Equation~\ref{eq:timing-model}) is then used to
+predict the median latency for each byte transition by computing the
+codeword DHD using the recovered ECC. Figure~\ref{fig:sierpinski}
+(bottom) shows the residual heatmap after subtracting the predicted
+latency from the measured median latency. The structural pattern is
+completely eliminated, leaving only a noisy residual consistent with
+stochastic filament dynamics. This result confirms that ECC activity is
+the sole source of structured timing variance in these devices, and that
+TRNGs that do not account for the underlying ECC will overstate their
+harvested entropy.
+

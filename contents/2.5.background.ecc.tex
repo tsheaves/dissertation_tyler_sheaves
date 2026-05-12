@@ -1,0 +1,82 @@
+\section{Linear Block Codes and Error-Correcting Codes}
+\label{sec:bg-ecc}
+
+Error control coding is a standard technique for improving the
+reliability of memory systems. In OxRAM memories, the raw bit error rate
+(RBER) is lower than in conventional 3D-NAND flash and is comparable to
+that of DRAM, making simple linear block codes generally sufficient to
+achieve an acceptable post-correction BER in the range of
+$10^{-8}$--$10^{-12}$~\cite{patel2020bit}. Several studies have shown
+that the optimal error control strategy for OxRAM balances ECC strength
+against WRITE-VERIFY complexity, since stronger ECCs permit looser
+programming tolerances while simpler WRITE-VERIFY schemes reduce
+programming time~\cite{hayakawa2017resolving,
+	fukuyama2019comprehensive}. While the exact ECC implementations used in
+commercial products are considered vendor trade
+secrets~\cite{patel2020bit}, available evidence from manufacturers
+suggests that simple linear block codes are sufficient for commercial
+OxRAM devices~\cite{hayakawa2017resolving}.
+
+A linear block code (LBC) protects a $k$-bit dataword by appending $r$
+parity bits to form an $n$-bit codeword, where $n = k +
+	r$~\cite{hamming1950error, sklar2004abcs}. Encoding is performed by
+multiplying the dataword $\mathbf{d} \in \mathrm{GF}(2)^k$ by a
+generator matrix $\mathbf{G} \in \mathrm{GF}(2)^{k \times n}$:
+
+\begin{equation}
+	\label{eqn:codeword-gen}
+	\mathbf{c} = \mathbf{d}\mathbf{G}.
+\end{equation}
+
+In the canonical systematic form, the generator matrix is structured as
+$\mathbf{G} = [\mathbf{I}_k \mid \mathbf{P}]$, where $\mathbf{I}_k$ is
+the $k \times k$ identity matrix and $\mathbf{P}$ is the $k \times r$
+parity submatrix. In systematic form, the codeword is simply the data
+word concatenated with the parity bits:
+
+\begin{equation}
+	\mathbf{c} = \mathbf{d}[\mathbf{I}_k \mid \mathbf{P}] = [\mathbf{d} \mid \mathbf{d}\mathbf{P}].
+\end{equation}
+
+The parity submatrix $\mathbf{P}$ encodes the linear relationships
+between data bits and parity bits: each column of $\mathbf{P}$ specifies
+which data bits are XORed to produce the corresponding parity bit. The
+code rate $R = k/n$ expresses the fraction of the codeword that carries
+user data.
+
+Decoding is performed using the parity check matrix $\mathbf{H} =
+	[\mathbf{I}_{n-k} \mid \mathbf{P}^T]$, which is orthogonal to
+$\mathbf{G}$: $\mathbf{G}\mathbf{H}^T = \mathbf{0}$. Given a potentially
+corrupted codeword $\mathbf{r}$ read from memory, the syndrome is
+computed as:
+
+\begin{equation}
+	\label{eqn:codeword-syndrome}
+	\mathbf{S} = \mathbf{r}\mathbf{H}^T.
+\end{equation}
+
+If no errors occurred, $\mathbf{S} = \mathbf{0}$. A non-zero syndrome
+indicates that one or more errors are present. The structure of
+$\mathbf{H}$ determines whether detected errors can be corrected: a code
+with minimum Hamming distance $d_\text{min}$ between codewords can
+correct up to $t = \lfloor(d_\text{min} - 1)/2\rfloor$ bit errors per
+codeword~\cite{hamming1950error, sklar2004abcs}.
+
+Single-error-correction, double-error-detection (SEC-DED) codes are
+commonly used in DRAM and embedded memory systems. Correcting a single
+bit error requires encoding the position of the error, which demands at
+least $\lceil\log_2(n)\rceil$ parity bits; the double-error detection
+capability adds one additional parity bit~\cite{sklar2004abcs}. More
+powerful codes such as BCH codes offer higher correction capability at
+the cost of additional parity overhead and more complex encoding and
+decoding circuitry. The appropriate code strength for a given memory is
+determined by the target post-correction BER and the RBER of the
+underlying array~\cite{hayakawa2017resolving,
+	fukuyama2019comprehensive}.
+
+In commercial ReRAM products, the parity submatrix $\mathbf{P}$ is not
+disclosed by the vendor. Without knowledge of $\mathbf{P}$, the parity
+bit transitions associated with any given data write cannot be
+predicted, and codeword-level timing models cannot be constructed. The
+recovery of $\mathbf{P}$ from write-access timing is the central
+contribution of Chapter~\ref{chap:brewrc}.

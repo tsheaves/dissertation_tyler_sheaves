@@ -1,0 +1,6 @@
+\begin{figure}[htbp]
+  \centering
+  \includesvg[width=\linewidth]{img/capture_miss.svg}
+  \caption{High level necessity of target clock tuning. (1) is the clock of the target computation co-located on the FPGA fabric, (2) is the effect of that target's circuit on the PDN, (3) and (4) represent in blue the window of time information can be captured by the TDC. (3) is the default configuration of the TDC, where the capture period has an unknown relationship to the target computation's effect on the PDN and sampling may contain no relevant information. (4) is a shift in the value of $\phi$ such that the TDC sampling phase aligns with the target's clock and the output of the TDC maximizes information relevant to the co-tenant.}
+  \label{fig:capture-miss}
+\end{figure}

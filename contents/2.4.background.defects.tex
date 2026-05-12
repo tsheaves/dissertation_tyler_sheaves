@@ -1,0 +1,43 @@
+\section{Defects and Wearout in OxRAM}
+\label{sec:bg-defects}
+
+Repeated SET and RESET cycling in OxRAM devices leads to gradual
+degradation of the conductive filament, resulting in a reduced
+resistance ratio $R_\text{OFF}/R_\text{ON}$~\cite{chen2011physical,
+	hayakawa2017resolving}. This degradation arises from cumulative defect
+generation and migration: repeated cycling creates trap states in the
+switching layer, alters the local oxygen vacancy distribution, and
+progressively modifies the filament morphology~\cite{chen2011physical}.
+Over time, these changes increase the number of PV iterations required
+to complete a transition and shift the write latency distribution toward
+longer completions. The endurance of an OxRAM device is typically
+specified as the number of SET/RESET cycles before the RBER exceeds a
+target threshold~\cite{hayakawa2017resolving,
+	fukuyama2019comprehensive}.
+
+In addition to long-term endurance degradation, OxRAM devices exhibit a
+short-term effect called filament relaxation: a transient drift in cell
+resistance that occurs shortly after a RESET
+operation~\cite{li2016short}. During relaxation, oxygen ions partially
+diffuse back toward the filament region, causing the HRS resistance to
+decrease over time before stabilizing. This effect can compromise
+short-term data integrity if verification is performed too soon after
+programming~\cite{li2016short}. Relaxation effects are typically
+mitigated in WRITE-VERIFY schemes by introducing a delay between the
+programming pulse and the resistance measurement, or by setting a
+conservative verification threshold that accounts for expected
+resistance drift.
+
+Wearout has direct implications for ReRAM-based entropy sources. In the
+early stages of device life, increased PV cycle counts broaden the write
+latency distribution and can increase the min-entropy of individual
+timing measurements~\cite{fukuyama2019comprehensive}. However, continued
+degradation shifts the distribution toward longer completions, reducing
+the spread of the distribution and eventually collapsing it toward a
+narrow, high-latency regime with low effective entropy. From the
+perspective of NIST SP~800-90B evaluation, symbol encodings used for
+entropy harvesting must accommodate wearout-driven distributional drift,
+with sufficient bin headroom to capture the evolving support of the
+distribution without saturation~\cite{sonmez2016recommendation}. The
+characterization of wearout effects on entropy yield is addressed in
+Chapter~\ref{chap:trng}.

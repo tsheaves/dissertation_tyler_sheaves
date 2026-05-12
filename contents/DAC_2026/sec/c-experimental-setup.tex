@@ -1,0 +1,27 @@
+\ssection{Experimental Setup}
+The experiments described in the Sections \ref{sec:prelim-expts} and \ref{sec:brew-rc} are performed on four samples of two ReRAM products from RAMXeed. Specifications of interest for each device are listed in Table \ref{tab:reram_spec}.
+Each experiment collects write latencies measuring the time to complete write operations, producing a dataset of write latencies corresponding to applied test vectors.
+% \begin{equation}
+% \mathcal{D} = \left(d_0^{(i)}, d_1^{(i)}, t_w^{(i)} \right)
+% \end{equation}
+% where $t_w^{(i)}$ is the measured write latency for the $i^{th}$ write operation transitioning an $n$-bit logically contiguous region from an initial state $d_0^{(i)} \in \left\{ 0,1\right\}^n$ to a final state
+% $d_1^{(i)} \in \left\{ 0,1\right\}^n$.
+Each write is committed to the memory over a SPI interface by de-asserting chip-select following the last byte of a $\texttt{WRITE}$ operation. Write latency is measured from the time the write transaction is committed, to the time the write-in-progress (WIP) bit of the STATUS register is cleared. Measurements of $t_w$ are quantized by the time required to check for the completion of a write ($\Delta t$). 
+% Therefore, each write latency measurement is defined as
+% \begin{equation}
+% t_w \in \left\{i \Delta t \mid i \in \mathbb{N} \right\}
+% \end{equation}
+% where $i$ is the number of checks performed before for the $i^{th}$ write operation completes. 
+$\Delta t$ is the minimum time required to perform a read status register (RDSR) operation on each RAMXeed module. The RDSR can be polled by continuing to drive the SPI clock after an initial opcode, returning the status after every 8 SPI cycles.
+% The RDSR operation is required to determine when a committed write to memory completes. To perform a RDSR operation, the SPI bus must drive an initial 8-bit opcode followed by at least 8 SPI clock cycles to return the 8-bit status. After obtaining the first status byte, RDSR can continue to be polled by holding chip select while driving SPI clocks. In this polling mode, the status is returned every 8 SPI clock cycles (ignoring the initial opcode). 
+The write completes when the write-in-progress (WIP) bit of the status register is cleared, and the write latency is recorded. The sampling period for measurements of $t_w$ is defined as the time between successive RDSR operations
+$$ \Delta t = \frac{8}{f_{SPI}}.$$
+We operate the SPI interfaces at the maximum frequency defined in the specification. Therefore, the minimum $\Delta t$ of the MB85AS4MT and MB85AS8MT memories are 1.6$\mu$s and 0.8$\mu$s, respectively.
+%For any measurement of $t_w$, $\hat{t_w}$,  $t_w$ is at most $\hat{t_w}$ and at least $\hat{t_w} + T_{sample}$. In the write latency distributions presented in the rest of the paper, each measured $t_w$ is therefore quantized as
+% \begin{equation}
+% t_{k-1} \; T_{sample} < t_w \le t_k \; T_{sample} \implies \widehat{t}_w=t_k
+% \end{equation}
+We apply and time SPI transactions to all samples of the MB85AS4MT and MB85AS8MT ReRAM chips using a Terasic DE10-Nano Cyclone V SoC FPGA development kit. For each write operation, a counter on the FPGA captures $t_w$, which is then pushed to a response FIFO. The FPGA is used primarily to scale our experiments to many chips. Prior works have demonstrated similar timing capabilities using microcontrollers \cite{tolga2024trng, ferdaus2024hiding}.
+
+\input{tab/ramxeed_device_comparison}
+

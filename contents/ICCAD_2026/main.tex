@@ -1,0 +1,76 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+% \usepackage{caption}
+\usepackage[hidelinks]{hyperref}
+\usepackage{mathtools}
+% \usepackage{subcaption}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+% \usepackage{algorithm}
+% \usepackage[noend]{algpseudocode}
+% \makeatletter
+% \let\Comment\@undefined
+% \makeatother
+% \newcommand{\Comment}[1]{\hfill$\triangleright$~\textit{#1}}
+% \usepackage{microtype}
+
+\usepackage[linesnumbered, ruled, noend]{algorithm2e}
+
+\begin{document}
+
+\title{ECC-aware Entropy Harvesting in Commercial-off-the-shelf ReRAM Memories}
+
+% \author{\IEEEauthorblockN{Tyler Sheaves}
+% \IEEEauthorblockA{\textit{University of California, Santa Cruz} \\
+% \textit{Computer Science \& Engineering}}
+% }
+
+\maketitle
+
+\setlength{\textfloatsep}{5pt}
+\setlength{\floatsep}{5pt}
+
+\input{sections/a-abstract}
+
+\begin{IEEEkeywords}
+Entropy harvesting, Emerging Memories, Security Primitives.
+\end{IEEEkeywords}
+
+\input{sections/b-introduction}
+\input{sections/c-background}
+\input{sections/d-preliminary-experiments}
+\input{sections/e-procedure}
+\input{sections/f-results}
+\input{sections/g-prior-work}
+\input{sections/h-conclusion}
+
+\clearpage
+\bibliographystyle{ieeetr}
+\bibliography{
+  bib/brew-rc,
+  bib/intro,
+  bib/ecc,
+  bib/rram_cim,
+  bib/rram_crossbars,
+  bib/rram_devices_overview,
+  bib/rram_ecc,
+  bib/rram_rad_hard,
+  bib/rram_re,
+  bib/rram_sec_and_sec_apps,
+  bib/rram_commercial,
+  bib/rram_neuromorphic,
+  bib/rram_write_verify,
+  bib/rram_wear,
+  bib/validation
+}
+
+\end{document}

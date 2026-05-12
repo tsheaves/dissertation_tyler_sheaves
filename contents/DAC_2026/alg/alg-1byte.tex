@@ -1,0 +1,27 @@
+\begin{algorithm}[!t]
+\footnotesize
+\caption{1-byte test pattern generation \label{alg:1byte}}
+\begin{algorithmic}[1]
+\State $B \gets$ word\_bytes() \Comment{2 for 4Mb, 4 for 8Mb}
+\State $N_{\text{WORDS}} \gets 10$
+\State $W \gets$ rand\_word\_aligned\_addrs($B$, $N_{\text{WORDS}}$)
+\ForAll{word\_addr \textbf{ in } $W$}
+    \ForAll{$G$ \textbf{ in } [$\mathbf{0}$, $\mathbf{1}$]}
+        \State init\_word(word\_addr, $G$) \Comment{1, $B$-byte write op}
+        \State $P \gets$ shuffle(range(0, $B{-}1$))
+        \ForAll{byte\_pos \textbf{in} $P$}
+            \State $Tr \gets$ get\_all\_byte\_transitions\_rand\_order()
+            % \State from\_byte $\gets$ pack\_byte(byte\_pos, Tr[0].from)
+            \State from\_byte $\gets$ Tr[0].from
+            \State write\_byte(word\_addr, from\_byte)
+            \Comment{1, 1-byte write op}
+            \ForAll{tr \textbf{in} $Tr$}
+                \State to\_byte $\gets$ tr.to
+                \State write\_byte(word\_addr, to\_byte)
+                \Comment{1, 1-byte write op}
+            \EndFor
+        \EndFor
+    \EndFor
+\EndFor
+\end{algorithmic}
+\end{algorithm}

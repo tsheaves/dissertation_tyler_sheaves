@@ -1,0 +1,97 @@
+\ssection{Background}
+\label{sec:bg}
+In this section, we provide a background on the device and architectural behaviors that determine write latency in commercial ReRAM crossbar memories, including bipolar switching dynamics, PV loops, and linear block codes (LBCs). %We then discuss the application domains most relevant to BREW-RC.
+
+\ssubsection{ReRAM/OxRAM Crossbar Arrays}
+\label{sec:oxram-xbar}
+% Construction
+The most widely deployed form of resistive memory is ReRAM devices based on transition-metal oxides (OxRAM).
+An OxRAM device consists of a metal-oxide stack sandwiched between two electrodes. OxRAM devices are integrated into memory bitcells that enable cell access and isolation within memory arrays \cite{yu2016resistive}. OxRAM arrays consist of intersecting word lines (WLs) and bit lines (BLs), arranged in a crossbar structure, where bitcells are placed at each WL/BL intersection.
+OxRAM devices are CMOS compatible, and have stable filamentary switching behavior \cite{chen2020reram, ielmini2025resistive}.
+% Many devices require an initial \textit{forming} step, during which a large applied bias is applied to the OxRAM device creating a conductive filament (CF) through localized oxygen vacancy generation. 
+% Subsequent operation typically 
+
+The most common OxRAM device biasing regimes operate on the principle of \textit{bipolar} switching; applying one voltage polarity repairs or thickens the conductive filament (CF), to yield a low-resistance state (LRS); the opposite polarity ruptures or narrows the CF to produce a high-resistance state (HRS) \cite{wong2012metal, ielmini2025resistive}. Operations that attempt to bring an OxRAM device to a LRS and HRS state are referred to as SET and RESET operations, respectively. OxRAM SET and RESET operations produce asymmetric switching dynamics and require unique biases, resulting in asymmetric, data-dependent, timing behavior.
+% In 1T1R (1-transistor-1-resistor) architectures, a dedicated access transistor suppresses leakage and provides per-cell isolation. 1S1R (1-selector-1-resistor) bitcells use a nonlinear selector element to limit sneak-path currents so that many cells can share wordline (WL) and bitline (BL) drivers \cite{xu2015overcoming, yu2016resistive}. 
+Bipolar switching requires strict, polarity-dependent, WL/BL biasing that typically prohibits concurrent SET and RESET operations \cite{xu2015overcoming, yu2016resistive}. As a result, write controllers must serialize SET and RESET phases.
+% In 1T1R arrays this requirement stems from distinct bitcell word-line voltage requirements, while in 1S1R arrays multiple WL/BL biases for the same row of selected cells is not possible \cite{xu2015overcoming, yu2016switching}. 
+This \emph{polarity serialization} is the primary cause of the data-dependent latency variations we exploit in this work.
+% induces oxygen ion migration that ruptures or repairs the filament, toggling the device between a high-resistance state (HRS) and a low-resistance state (LRS) \cite{wong2012metal, ielmini2025resistive}. Transitions from HRS to LRS are referred to as SET operations, while LRS to HRS transitions are referred to as RESET. OxRAM devices typically exhibit significant asymmetries in SET/RESET bias condition requirements, switching dynamics and variability \cite{milo2021accurate, ielmini2025resistive}. Individual devices are integrated into memory bit cells. The most common are 1T1R (1-transistor–1-resistor) and 1S1R (1-selector–1-resistor) cells.
+% In 1T1R architectures, the access transistor provides isolation and bias control, largely eliminating sneak-path currents. In contrast, 1S1R cells use a nonlinear selector element to suppress leakage in dense passive arrays, but share WL and BL drivers among multiple cells, which constrains the allowable write voltages and polarities \cite{yu2016resistive}.
+% ReRAM arrays consist of intersecting word lines (WLs) and bit lines (BLs), arranged in a crossbar structure. To manage WL/BL capacitance and IR drop, large arrays are divided into smaller sub-arrays with local routing and global decoders \cite{xu2015overcoming, kawahara20128}. Because SET/RESET operations require opposite bias polarities, write operations containing both $0\to1$ and $1\to0$ transitions are typically issued in separate phases. In 1T1R arrays, this requirement arises from SET/RESET operations needing distinct WL voltages, while in cross-point arrays WL/BL drivers can apply only one polarity at a time to selected cells \cite{xu2015overcoming, yu2016resistive}. 
+% Although the memories we test in this work use TaO$_x$-based OxRAM cells, the architectural polarity-dependent timing behaviors discussed here arises broadly across filamentary bipolar ReRAM technologies including HfO$_2$ OXRAM, valence-change (VCM) devices, and electromechanical metallization (ECB/CBRAM) memories, which all perform 
+
+\ssubsection{ReRAM Write Latency ($t_w$) Variance}
+ReRAM bitcells are programmed using program-verify (PV) loops,\footnote{Some related works refer to program-verify loops by the sequence of sub-operations they implement (ex. write-verify , write-verify-finalize, etc.) \cite{kawahara2013filament, fukuyama2019comprehensive}.}
+which apply programming pulses and interleave measurements of cell resistance until cell resistance falls into a target window \cite{jo2009programmable, yu2012switching, fukuyama2019comprehensive, milo2021accurate}. Single-level ReRAM cells (SLCs) have two resistance windows, while high density, compute-in-memory, or neuromorphic applications using multi-level cells (MLCs) with several resistance windows require more sophisticated PV loops \cite{puglisi2015novel, milo2021accurate}. In both SLC and MLC regimes, the runtime of a PV loop, and therefore the write latency ($t_w$), is non-deterministic. 
+
+% We abstract the total latency ($t_w$) of a ReRAM memory write operation as both a deterministic component $t_{wd}$ (e.g. write) and a stochastic PV loop component $t_{pv}$.
+% % Single-level ReRAM cells (SLCs) map logical `0' and `1' to two binary cell resistance states. SLCs can be programmed reliably for one polarity at a time  amplitude and duration in each polarity until all cells reach a target binary resistance state. In multi-level scenarios (i.e. high-density, CIM, and neuromorphic applications), PV loops often contain more complex inner-sequences such as incremental step programming or small corrective pulses to reach finer resistance targets \cite{puglisi2015novel, milo2021accurate}. The resulting word-level write latency $t_w$ consists of a deterministic component $t_{wd}$ (e.g. buffer de-serialization and ECC encoding) and a stochastic component $t_{pv}$ arising from the programming activity exercised by the PV loop.
+% \begin{equation}
+% \label{eqn:tw}
+% t_w = t_{wd} + t_{pv}
+% \end{equation}
+% where $t_{pv}$ largely depends on the logical transition polarities that must be driven. 
+We introduce the term  \emph{directional Hamming distance} (DHD) to represent the number of positive and negative bit transitions within each data word.
+We describe logical dataword transitions with respect to a current dataword ($d_0$) and a target dataword ($d_1$). Bits within the word either maintain the same state, transition $0\to1$ (positive polarity), or transition $1\to0$ (negative polarity).  The DHD is represented as a tuple, counting the positive and negative polarity transitions: $\left( w_{0\to1}, w_{1\to0} \right)$.
+
+Table~\ref{tab:polarity-mix} demonstrates DHD, $\left( w_{0\to1}, w_{1\to0} \right)$, and its effect on  $t_{w}$. 
+We categorize DHD characteristics that impact $t_{w}$. 
+% ReRAM crossbar arrays typically serialize multi-polar writes.
+Write operations that have no bitcell transitions produce a minimal $t_{w}$; we label these with the category \texttt{NONE}. 
+Write operations in which all bitcells have the same transition polarity produce a intermediate $t_{w}$; we label these \texttt{UNIPOLAR}.
+Positive (P) and negative (N) polarity write latency may differ, depending on the underlying ReRAM switching dynamics and PV loop implementation.
+Finally, write operations where at least one bitcell has a positive transition, and one bitcell has a negative transition result in polarity serialization, producing a maximal $t_{w}$; we label these \texttt{BIPOLAR}.
+%In Section \ref{sec:prelim-expts} we demonstrate that these simple data-dependent timing relationships are measurable in commercial ReRAM products.
+\input{tab/hw_categories}
+
+\ssubsection{Error Correcting Codes}
+OxRAM memories are prone to a number of reliability concerns which have been addressed with PV loop optimizations and error correcting codes \cite{hayakawa2017resolving, fukuyama2019comprehensive, crafton2021cim}. 
+%Error correcting codes (ECCs) trade additional bits and logic for fault tolerance.
+The most common ECCs are linear block codes (LBCs) \cite{hamming1950error}. 
+LBCs add $r$ parity bits ($p$) to each $k$-sized data word in memory, forming an $n$-bit codeword $c$. An ECC encoder generates parity bits  that are appended to the data word during write operations, and a decoder uses these parity bits to check and correct errors during reads \cite{sklar2004abcs}. As our work exploits perturbations in write latency, we focus on ECC encoding.
+
+The strength (i.e. correction capability) of an LBC is defined by the minimum distance between codewords $D_{min}$ as
+{
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\begin{equation}
+    t=\left\lfloor \frac{D_{\min}-1}{2} \right\rfloor.
+\end{equation}
+}
+A code rate ($R=\frac{k}{n}$) describes the overhead associated with the code as a ratio of the number of data bits to total codeword bits. In the canonical systematic form, where data bits precede parity bits, an LBC can be described by a $k \times r$ parity submatrix ($P$). $P$ maps data bits ($d$) to parity bits $p$ through a generator matrix ($G$)
+{
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\begin{equation}
+    G = \left[I_k \mid P\right],
+\end{equation}
+}
+where $I_k$ is an identiy matrix of dimension $k$.
+A codeword ($c$) is generated from $G$ by the $GF(2)$ matrix multiplication
+{
+\setlength{\abovedisplayskip}{2pt}
+\setlength{\belowdisplayskip}{2pt}
+\begin{equation}
+    c = d \; G = d\left[I_k \mid P\right] = \left[d | p\right].
+\end{equation}
+}
+Parity bits are not directly observable, but can influence $t_w$ in ReRAM memories. In Section \ref{sec:brew-rc} we demonstrate how measurements of $t_w$ can be used to recover the complete parity submatrix.
+
+% Studies on commercial OxRAM memories typically do not discuss undocumented ECCs \cite{yang2014reliability, bi2019total, korkian2022single}. Without knowledge of the underlying ECC, reported bit-error rates (BERs) are difficult to interpret, as it is unclear if the ReRAM memory array is reliable or if an underlying ECC is silently correcting errors. 
+% Parity bit updates perturb $t_{w}$ by altering the transition polarity of write operations. In Section \ref{sec:sat-encoding} we demonstrate how observations of these fluctuations can be used to generate constraints useful for reverse engineering the underlying parity submatrix. 
+
+% Studies on commercial OxRAM memories typically do not discuss undocumented ECCs \cite{yang2014reliability, bi2019total, korkian2022single}. Without knowledge of the underlying ECC, reported bit-error rates (BERs) are difficult to interpret, as it is unclear if the ReRAM memory array is reliable or if an underlying ECC is silently correcting errors. 
+
+% \ssubsection{ReRAM Timing Side-channels}
+% Several prior studies have investigated timing side-channels in ReRAM crossbars \cite{kommareddy2019crossbar, khan2021comprehensive, krautter2022data, wang2023side}. Bipolar switching time can be asymmetrical in OxRAM devices, and these asymmetries can propagate as measurable timing/power perturbations, that may leak sensitive data. These attacks have been evaluated by simulating these asymmetries and demonstrating how they project into various crossbar architectures. However, prior investigations do not consider the effects of ECC and how ECC functions may impact crossbar timing measurements. Parity bits are \textit{hidden} in the sense that they are not included in the data written or read by a user. Circuitry within the memory silently generates (encodes) and stores parity bit states during write operations. This behavior affects $\left( w_{0\to1}, w_{1\to0} \right)$ and, consequently perturbs $t_{w}$.
+
+% In this work, we will demonstrate that knowledge of codeword transition DHD $\left( w_{0\to1}, w_{1\to0} \right)$ can accurately predict the distribution of write latencies in commercial memories. However, absent knowledge of the underlying ECC function, the codeword $\left( w_{0\to1}, w_{1\to0} \right)$ becomes ambiguous, complicating timing side-channel attacks. BREW-RC (Section \ref{sec:brew-rc}) closes this gap by extracting the relationship between data bits and parity bits ($P$), allowing both the recovery of critical reliability information, and the generation of more accurate timing models in commercial ReRAM products.
+
+\ssubsection{Applications of ReRAM Arrays}
+OxRAM devices are intrinsically radiation tolerant \cite{marinella2021radiation} and have attracted significant interest in applications where reliability in harsh environments is critical \cite{yang2014reliability, chen2014single, bi2019total, lyu2021research, korkian2022single}. Studies on commercial OxRAM memories typically do not discuss undocumented ECCs \cite{yang2014reliability, bi2019total, korkian2022single}. Without knowledge of the underlying ECC, reported bit-error rates (BERs) are difficult to interpret, as it is unclear if the ReRAM memory array is inherently reliable or if an underlying ECC is silently correcting errors. 
+
+Prior work has evaluated ReRAM write latency as an entropy source for security primitives \cite{tolga2024trng, suri2018high}. These works identify that in commercial ReRAMs, large-scale timing behavior is shaped by some unknown latent structural effects. However, they are able extract useful randomness from the fine-grained portion of latency measurements by truncating timing measurements, using only the lower bits. While effective, these techniques are unable to describe large-scale timing behaviors or effectively model $t_w$ distributions without knowledge of the ECC.
+% In Section \ref{sec:results}, we demonstrate how BREW-RC can generate significantly improved timing models that capture the subtle timing perturbations injected by parity bits. This improvement provides context of both side-channel and security primitive studies.
+
+% . This behavior may effect $\left( w_{0\to1}, w_{1\to0} \right)$ and $t_{pv}$, although it is possible for multi-bit transitions to result in a consistent parity state despite a data word transition. In Section \ref{sec:prelim-expts} we will demonstrate that parity bit updates introduce a leakage channel that exposes the transition polarity of parity bit updates.

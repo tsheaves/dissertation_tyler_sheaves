@@ -1,0 +1,53 @@
+\section{Background}
+
+\subsection{Error Correcting Codes}
+A linear block error-correcting code (ECC) protects a $k$-bit dataword by appending $r$ parity bits to form an $n$-bit codeword, where $n = k + r$~\cite{hamming1950error, sklar2004abcs}.  Encoding is performed by multiplying the dataword by a generator matrix $\mathbf{G} \in \mathrm{GF}(2)^{k \times n}$, so that $\mathbf{c} = \mathbf{d} \cdot \mathbf{G}$.  The minimum Hamming distance $d_{\min}$ of the code determines its error-correcting capability: a code can correct up to $t = \lfloor (d_{\min} - 1) / 2 \rfloor$ bit errors per codeword. Commercial products including ReRAM arrays embed ECCs to mask bitcell retention and endurance failures \cite{hayakawa2017resolving}.
+
+\subsection{Entropy Sources, TRNGs, \& Evaluations}
+
+A \emph{noise source} is the physical process that provides unpredictability.  An \emph{entropy source} wraps a noise source together with digitization, health testing, and optional conditioning into a subsystem whose output can seed a cryptographic random bit generator~\cite{sonmez2016recommendation}.  A true random number generator (TRNG) implements an entropy source in hardware.
+
+The digitized noise source output produces a raw bitstream whose per-sample unpredictability is quantified by min-entropy,
+%
+\begin{equation}\label{eq:hmin}
+  H_\infty(X) = -\log_2\!\bigl(\max_{x}\, \Pr[X = x]\bigr),
+\end{equation}
+%
+which captures the probability of an adversary's best single guess.  For an 8-bit symbol alphabet, $H_\infty$ ranges from 0 (deterministic) to 8 (uniform).  Min-entropy is always a lower bound on Shannon entropy and is the standard measure for cryptographic applications because it reflects the worst-case predictability of the source rather than its average behavior~\cite{sonmez2016recommendation}.
+
+A \emph{conditioning} component compresses the raw bitstream according to the estimated $\hat{H}_\infty$, concentrating source entropy into a shorter, near-uniform output.  NIST SP~800-90B distinguishes between \emph{vetted} conditioning functions, such as SHA-256 and AES-CBC-MAC, whose entropy accounting is performed analytically under the assumption that the primitive behaves as an ideal random function, and \emph{non-vetted} functions, whose output must be evaluated directly by the SP~800-90B stimators~\cite{sonmez2016recommendation}.  In this work we use a vetted conditioner (SHA-256) and rely on the SP~800-90B entropy estimate of the raw source as the basis of the security argument.
+
+We evaluate raw source quality with the NIST SP~800-90B estimator suite~\cite{sonmez2016recommendation}, which applies ten non-parametric min-entropy estimators to ${\geq}\,1$\,M samples and reports the conservative minimum. Conditioned output is then checked with NIST SP~800-22~\cite{rukhin2001statistical}, which applies fifteen frequency, serial, spectral, and complexity tests across sub-sequences, and PractRand~\cite{practrand}, a streaming battery that evaluates at geometrically increasing data thresholds and is particularly sensitive to subtle correlations at small sample sizes.  We note that statistical testing of conditioned output does not constitute an entropy proof; it serves as a sanity check that the conditioning pipeline functions as intended.
+
+\subsection{ReRAM Devices \& Arrays}
+
+The most common ReRAM stacks are oxide-based (OxRAM) and operate in a bipolar switching regime~\cite{wong2012metal, chen2020reram}. During a SET operation, a conductive filament (CF) is grown by applying programming pulses in one polarity; the filament comprises oxygen vacancies produced by ion migration under bias~\cite{wei2008highly, yu2012switching}.  A RESET operation ruptures the filament by applying pulses in the opposing polarity. The switching dynamics are governed by the local electric field, thermal profile, and the stochastic availability of oxygen vacancies at the filament tip~\cite{yu2012switching}.
+
+Programming is typically managed by a program-verify (PV) loop that applies pulses until a target resistance state is reached~\cite{kawahara2013filament, milo2021accurate}.  Because filament formation and rupture are stochastic, the number of PV iterations required to complete a write varies from cycle to cycle, making PV loop completion time non-deterministic~\cite{yu2012switching}.  It is this cycle-to-cycle variation in write latency that we exploit as an entropy observable.
+
+When a word is written to a ReRAM crossbar, one or more bitcells must transition via SET or RESET.  Writes requiring both polarities may be serialized when the crossbar shares wordline (WL) voltages or bitline/sourceline (BL/SL) rails~\cite{sheaves2026brewrc}.  In the presence of an ECC, parity bit updates impose additional deterministic structure on the write transaction timing, as the number and polarity of parity flips depend on the codeword transition rather than the data content alone. 
+
+SET and RESET ReRAM operations may be arbitrarily mapped to transitions to logical '1` and logical '0`. For the remainder of this work we use SET to mean a transition to a logical '1` in memory and a the growth of a CF and RESET to mean a transition to a logical '0` and the rupture of a CF.
+
+\subsection{ReRAM Entropy}
+
+The stochastic nature of resistive switching in ReRAM has motivated its use as an entropy source.  Balatti et al.~\cite{balatti2015true} provided an early demonstration that cycle-to-cycle SET variability in a single HfO$_x$ RRAM device can serve as a TRNG, exploiting the bimodal distribution of resistance when programming near the nominal set voltage. Subsequent work has explored both resistance-state variability and write-latency variability as entropy observables~\cite{suri2018high, pang2019memristors, tolga2024trng}.
+
+At the bitcell level, the number of PV pulses required depends on the initial CF state and the stochastic dynamics of oxygen ion migration~\cite{yu2012switching, wei2008highly}.  SET operations, which require nucleation of a new filament segment, tend to exhibit greater cycle-to-cycle variability than RESET operations, which rupture an existing structure.  This asymmetry has implications for entropy harvesting, as write transactions dominated by SET transitions may yield higher
+min-entropy per sample.
+
+Over time, cumulative defects degrade bipolar switching~\cite{chen2011physical, hayakawa2017resolving}.  Initially, wearout can increase timing entropy as more PV cycles are needed to complete a transition, introducing new timing bins.  However, continued degradation shifts the latency distribution toward longer completions, making low-latency outcomes statistically improbable and eventually reducing the effective entropy~\cite{fukuyama2019comprehensive}.  From the SP~800-90B perspective, symbol encodings must accommodate this drift with sufficient bins ahead of the distribution support to avoid saturation artifacts in the entropy estimate.
+
+\section{Related Work}
+
+\subsection{COTS ReRAM Entropy Harvesting}
+
+
+Two recent works have evaluated write-latency entropy from commercial off-the-shelf (COTS) ReRAM.  Suri and Chakraborty~\cite{suri2018high} demonstrated PUF extraction from Fujitsu (now RAMXEED) MB85AS4MT chips by polling the SPI write-in-progress (WIP) bit and applying a sum-of-squares mapping across page pairs.  Their study confirmed that commercial ReRAM exhibits measurable cycle-to-cycle latency spread, but the evaluation focused on PUF metrics (inter/intra Hamming distance) rather than min-entropy characterization of the raw source, and write sequences were applied in a fixed page-sequential order without consideration of the switching composition within each transaction.
+
+Arul et al.~\cite{tolga2024trng} extended this line of work to both Fujitsu (OxRAM) and Adesto (ECM) modules, applying NIST SP~800-22 and SP~800-90B to the cycle-to-cycle latency of random bits after von Neumann debiasing \cite{von1963various}. Their study identified structural patterns in the write-latency matrix, including Sierpinski-like gaskets on the Fujitsu devices that correlate with the bit-level polarity structure of the data transition. However, several aspects remain open. First, the von Neumann extractor discards approximately 75\% of raw bits, limiting throughput to tens of bits per second. The authors claim an extraction rate of between 30-120 bits/sec. Second, write patterns were randomized and spread across physical regions of the ReRAM that had not been characterized, meaning each measurement exercised a different and uncontrolled mixture of SET and RESET transitions; this conflates the stochastic filament contribution with the deterministic effect of varying switching compositions. Third, neither work accounts for the role of the on-chip ECC, whose parity-bit updates alter the polarity mixture of each write transaction in a data-dependent but deterministic manner~\cite{sheaves2026brewrc}.
+
+\subsection{ReRAM ECC}
+In ~\cite{sheaves2026brewrc}, the authors demonstrate that the ECC embedded within commercial ReRAM arrays can be reverse-engineered through write-latency side-channel measurements. Polarity serialization on the crossbar injects deterministic timing perturbations that are correlated with codeword structure rather than the underlying noise source. These perturbations are systematic: the same data-to-data transition always produces the same polarity mixture and therefore the same serialization pattern, independent of the stochastic filament dynamics.
+
+In this work, we leverage the recovered ECC structure to identify the write transaction switching composition (the mixture of SET and RESET operations) that maximizes entropy from stochastic filament dynamics while minimizing the deterministic timing artifacts introduced by ECC-driven serialization. By fixing a known region, burst size, and data pattern, we constrain the noise source to a repeatable operating point whose min-entropy can be rigorously evaluated with SP~800-90B, achieving conditioned throughput of 100--300\,kb/s.

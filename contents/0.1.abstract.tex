@@ -1,0 +1,130 @@
+In the last decade, commercial resistive random-access memory (ReRAM)
+modules have entered mass production as embedded non-volatile data
+storage for low-power microcontrollers and edge devices. ReRAM write
+operations complete through stochastic program-verify loops. The
+duration of each loop depends on the physical state of individual memory
+cells, making ReRAM an attractive entropy source for security primitives
+such as true random number generators and physically unclonable
+functions. Commercial devices improve reliability by augmenting user
+data with error-correcting codes that introduce additional switching
+activity on every write. Together, these mechanisms create structured
+timing leakage channels that have remained uninterpretable without
+costly, destructive reverse engineering of the underlying architecture.
+As a result, timing models are inaccurate, the security primitives that
+rely on ReRAM switching entropy cannot be properly characterized, and
+the timing side-channel attack surface of commercial ReRAM products
+remains uncharacterized.
+
+In crossbar architectures, strict sequencing constraints on SET and
+RESET operations produce data-dependent write latency distributions.
+Prior investigations of commercial ReRAM timing identified structured
+variance in these distributions but could not explain or model it.
+Embedded, undocumented error-correcting codes (ECCs) are the dominant
+source of this structured variance. The timing fluctuations introduced
+by ECC switching activity is large enough to obscure the stochastic
+device physics that prior security and entropy analyses assumed they
+were measuring. This dissertation closes that gap through systematic
+experimental characterization of commercial ReRAM write latency,
+revealing these dominant structural factors and demonstrating that they
+are recoverable through non-invasive side-channel analysis.
+
+We introduce a novel technique for \underline{B}it-exact
+\underline{R}ecovery of \underline{E}CC from \underline{W}rite Timing in
+\underline{R}eRAM \underline{C}rossbars (BREW-RC), the first technique
+to recover the bit-exact ECC parity submatrix from commercial ReRAM
+memories using only write-access timing, without physical probing or
+device modification. BREW-RC formulates ECC recovery as a SAT problem,
+deriving constraints from observed write latency distributions and
+recovering the complete generator matrix from two commercial products.
+The recovered matrix enables accurate codeword-level timing models,
+substantially improving side-channel analysis and enabling non-invasive
+reliability characterization of devices with undisclosed error
+correction capabilities.
+
+We apply this structural understanding to characterize stochastic write
+latency. Prior work on commercial ReRAM entropy sources applied
+aggressive debiasing to suppress structured variance of unknown origin.
+We demonstrate that this structure is fully explained by ECC activity.
+Isolating the deterministic ECC contribution from the underlying
+stochastic filament dynamics enables stationary, wear-leveled
+measurement sequences with min-entropy rigorously estimated under NIST
+SP 800-90B. We then characterize how device aging affects switching
+dynamics and entropy yield. The resulting TRNG passes NIST SP 800-22 and
+PractRand and achieves a 17x throughput improvement over prior ECC- and
+wearout-unaware methods.
+
+% Finally we describe how these contributions connect to an emerging
+% class of hardware security threats in which the physical state of
+% deployed devices encodes exploitable information that their logical
+% interfaces do not expose. FPGA Pentimenti, which recover prior device
+% data through Bias Temperature Instability effects on programmable
+% routing, are the most developed instance of this class. The timing
+% channels characterized in this dissertation occupy an analogous
+% position for ReRAM, establishing the observability, structural
+% modeling, characterization that exploitable data remanence in
+% commercial ReRAM will require.
+
+% % %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %%
+
+% % Prior Pentimenti-heavy Framing 
+
+% %% %% %% %% %% %% %% %% %% %% %% % %% %% %% %% %% %% %% %% %% %% %% %%
+
+% Abstract Recent discoveries have demonstrated a class of security
+% vulnerabilities that violate isolation guarantees in FPGA cloud systems
+% through leakage channels emerging from low-level transistor device
+% physics, known as FPGA Pentimenti. Historically, Pentimenti are traces
+% of an earlier composition visible beneath the surface of a painting. In
+% the context of hardware security, FPGA Pentimenti are remnants of prior
+% device state that persist after logical erasure, manifesting as
+% threshold voltage shifts driven by Bias Temperature Instability (BTI)
+% at transistor gate oxide interfaces. Pentimento-based attacks have been
+% demonstrated on Xilinx FPGAs and require high-precision propagation
+% delay sensors, the ability to propagate measurement pulses through
+% sensitive assets within the FPGA fabric, and the ability to integrate
+% BTI effects across many of these assets (i.e. by chaining routing
+% resources). These requirements are practical on FPGAs where highly
+% reconfigurable fabrics allow attackers to freely place propagation
+% delay sensors and perform measurements on vulnerable assets. However,
+% it remains an open research challenge to find Pentimenti-like threats
+% outside of FPGA routing resources.
+
+% Resistive random access memories (ReRAMs) expose leakage channels that
+% resemble those exploited to recover FPGA Pentimenti. ReRAM devices
+% leverage non-deterministic programming sequences which operate on
+% stochastic device physics. Measuring the duration of these sequences
+% enables the construction of leakage channels which may expose the
+% internal state of ReRAM devices, proprietary architectural details,
+% and, perhaps, remnants of prior states (i.e. ReRAM Pentimenti). In the
+% last decade, commercial ReRAM products have entered mass production
+% making it possible to investigate timing side-channels that may expose
+% these leakage channels. However, commercial ReRAM timing is effected
+% significantly by the underlying crossbar memory architecture, the added
+% switching activity of error correcting codes, and the wearout state of
+% individual ReRAM cells. These factors introduce significant gaps that
+% must be solved before the deployment of Pentimenti-like attacks in
+% commercial ReRAM are possible.
+
+% This work presents the leakage channels necessary for the study of
+% Commercial ReRAM Pentimenti. First, we characterize the architectural
+% timing leakage channels in commercial ReRAM crossbar memories,
+% identifying how polarity serialization in the crossbar write path
+% produces data-dependent write latency distributions and demonstrating
+% that embedded, undocumented error correcting codes (ECCs) are the
+% dominant source of structured timing variance in commercial products.
+% We introduce BREW-RC, the first technique to recover the bit-exact ECC
+% parity submatrix from commercial ReRAM memories using only write-access
+% timing, without physical probing or device modification. Second, we
+% demonstrate that knowledge of the recovered ECC is necessary but not
+% sufficient to characterize the residual stochastic component of ReRAM
+% write latency. By applying ECC-aware analysis to isolate deterministic
+% parity-driven timing perturbations from the underlying stochastic
+% filament dynamics, we construct a framework for evaluating the true
+% entropy of commercial ReRAM timing sources, validated against NIST SP
+% 800-90B and shown to improve entropy harvesting throughput by 17x over
+% prior ECC-unaware methods. Together, these contributions establish the
+% observability and structural understanding required to pursue
+% Commercial ReRAM Pentimenti: identifying the timing leakage channels,
+% characterizing their deterministic and stochastic components, and
+% isolating the device-state remnants that may encode the analog
+% remanence of prior ReRAM cell states.

@@ -1,0 +1,211 @@
+%\begin{comment}
+
+\section{Related Work}
+\label{related}
+\paragraph{\textbf{TDCs for Power Side-Channels: }}
+
+The \name TDC allows us to rapidly compare the performance of our tuning techniques to different ``classes'' of prior work. Table~\ref{table:relatedwork} summarizes prior and related work as configurations of our sensor. 
+
+In our prior work, we showcase the capabilities of our \name TDC on a single vendor and characterize it's performance with respect to side-channel attacks \cite{prior}. In this work, we demonstrate the flexibility of our sensor architecture and tuning techniques by exploring an Intel implementation. This implementation is identical in architecture and introduces no additional modules. However, on Intel systems, we do not tune the sensor exclusively using fine-grained phase-shift increments as the phase step resolution is significantly greater on Intel systems. Instead, we use PLL phase and counter reconfiguration to accommodate the significantly larger phase-shift increment allowed on the Intel systems. In Section \ref{sensor_structure} we proposed a methodology to sweep both $\phi$ and $\theta$ multiple times at various coarse-grained phase step resolutions to construct a composite fine-grained sweep with an effective resolution closer to the Xilinx systems. Then, in Section \ref{results} we demonstrated feature parity between Intel and Xilinx systems and show tuning results from the Intel variant of our \name TDC.
+
+The majority of existing prior works never considered either $\theta$ tuning or $\phi$ tuning~\cite{gobulukoglu2021dac,schellenberg2018inside,schellenberg2018remote, gnad2017voltage}. Such sensors cannot achieve the signal resolution gains observed in Section~\ref{results}. These sensors will not apply well to cloud-FPGA environments or across different FPGAs because they assume a random $\theta$ and $\phi$ on each device and therefore do not extract general computation elements.
+
+Some prior work has introduced the concept of $\theta$ tuning~\cite{favi200917ps, krautter2020cpamap, daigneault2011high, zick2013sensing, glamovcanin2020cloud}. However, many of these are limited in ability and applicability to the cloud-FPGA environment. For example, the method proposed in \cite{favi200917ps} involves re-configuring the number of delay elements to change where the transition reaches in the delay line. This does not generalize well to the cloud-FPGA model, as the delay elements need to be compiled into the design or updated with partial reconfiguration, making it difficult to respond quickly to changing conditions in a multi-tenant FPGA. 
+
+The authors of \cite{krautter2020cpamap} consider another primitive variant of $\theta$ tuning, where they connect the pulse generator to several different places in the delay line through a set of multiplexers. This allows a user to shift $\theta$ by configuring the input location to the delay line. This is more runtime configurable but adds complexity to the design as the clock input must be duplicated and significantly limits the range of configurability as each position of $\theta$ needs to be predefined. 
+
+A more configurable approach for $\theta$ tuning is considered in \cite{daigneault2011high}, which leverages partial reconfiguration for modifying the routing between each delay element. This relies on that feature being exposed to the end user, which is potentially not an option in a cloud environment. This will be slower than our approach, which makes it difficult to adjust to rapidly changing conditions in cloud FPGAs (i.e., another user's design is allocated to the board). 
+
+The authors of \cite{zick2013sensing} propose that if calibration of the TDC is required, the clock to the delay line can be phase-shifted using a programmable clock generator, as we have in this work. They do not expand on this nor consider how $\theta$ tuning can be leveraged to avoid irregularities in the delay line or adjust to the PDN load created by other users' designs. 
+
+\begin{table*}[t!]
+\centering
+\caption{Summary of Prior Work and Quantitative Comparison. Prior works implement a subset of our sensor's capabilities, which can be summarized as a tuning tuple ($\theta$, $\phi$) of our sensor. Each tuning tuple is tested in our classification experiment to determine accuracy and loss and perform a CPA Attack on a soft processor running AES to report the GSR @ 50K, PSR (Min, Avg, Max) @ 50K, and PGE (Min, Avg, Max) @ 50K traces. No prior experiments have measured how information learned on one board generalizes to other boards (called Cross-Board) ---a crucial consideration for cloud attacks. Our tuning methodology and TDC Sensor improve co-tenant classification accuracy by 2.5$\times$ and increase the rate that correct subkey values are ranked as most likely (PSR) in a CPA attack by 2.2$\times$ relative to an un-tuned sensor. ``NA"}\label{table:relatedwork}\label{table:classification}\label{table:cpastats}
+%as compared to ($\uparrow\theta_{min}$, $\phi_{min}$)
+%Utilizing our tuning methodology and TDC Sensor, classification accuracy can be improved by 2.5$\times$ as compared to ($\uparrow\theta_{min}$, $\phi_{min}$). After a co-tenant computation has been classified as a cryptographic core, using our techniques increases the rate at which all correct subkey values are ranked as most likely (PSR) by nearly 2$\times$ in a CPA attack relative to an un-tunable sensor in prior work. \dr{Can we combine last two sentences as the takeaway?}}\label{table:relatedwork}\label{table:classification}\label{table:cpastats}
+\vspace{25px}
+{
+\resizebox{\columnwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+Literature & \begin{rotate}{50}($\uparrow\theta_{min}$, $\phi_{min}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{min}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{max}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{back}$)\end{rotate} & \begin{rotate}{50}($\uparrow\theta_{max}$, $\phi_{back}$)\end{rotate} & \begin{rotate}{50}Cross-Board\end{rotate} & \begin{rotate}{50}Class. \%\end{rotate} & \begin{rotate}{50}Class. Loss\end{rotate} & \begin{rotate}{50}Class. Gain\end{rotate} & \begin{rotate}{50}GSR@50K\end{rotate} & \begin{rotate}{50}PSR@50K\end{rotate} & \begin{rotate}{50}PGE@50K\end{rotate} & \begin{rotate}{50}PGE@50K Gain\end{rotate} \\
+\hline
+\cite{gobulukoglu2021dac,schellenberg2018inside,schellenberg2018remote, gnad2017voltage} & \cmark & &  &  &  &  & 32.146\% & 2.159 & $0\times$ & 0\% & (2\%, 15\%, 35\%) & (66, 101, 124) & $0\times$\\
+\cite{favi200917ps,krautter2020cpamap,daigneault2011high,zick2013sensing,glamovcanin2020cloud,won2015dual} & & \cmark & & & & & 51.160\% & 1.644 & $1.591\times$ & NA & NA & NA & NA \\
+This Work & \cmark & & & & & \cmark & 32.146\% & 2.159 & $0\times$ & 0\% & (2\%, 15\%, 35\%) & (66, 101, 124) & $0\times$\\
+This Work & & \cmark & & & & \cmark & 51.160\% & 1.644 & $1.591\times$ & NA  & NA & NA & NA\hspace{8mm} \\
+This Work & & & \cmark & & & \cmark & 75.788\% & 0.834 & $2.358\times$ & NA  & NA & NA & NA \\
+This Work & & & & \cmark & & \cmark & 75.552\% & 0.733 & $2.350\times$ & NA  & NA & NA & NA\\
+This Work & & & & & \cmark & \cmark & 80.943\% & 0.668 & $2.518\times$ & 4\% & (12\%, 46\%, 90\%)& (3, 46, 73) & $2.2\times$ \\
+\hline
+\end{tabular}}
+}
+\vspace{-12pt}
+\end{table*}
+
+The classification experiment we examined in this work is an essential consideration, as multi-tenant FPGA side-channel attacks often presuppose when and what computation is running alongside the attacker, e.g., the attacker assumes that a victim is performing a cryptographic operation. The first work to propose this~\cite{gobulukoglu2021dac} fails to generalize across FPGAs that training data was not collected on, making it incompatible with the cloud model. It cannot be generalized because it does not consider $\theta$ and $\phi$, so it leans heavily on the architectural features of the device for its classification. Our work rectifies this limitation and addresses a fundamental optimization step that must be taken with power fluctuation sensors. The classification network used in \cite{gobulukoglu2021dac}, ResNet50, is significantly more complex yet performs worse than the simplistic single-layer network used in this paper. This is an important consideration if the network is to be implemented in hardware for fast recognition to launch a CPA attack if a cryptographic device is recognized. 
+
+
+% \begin{table*}[t!]
+% \centering
+% \caption{Summary of sensor portability. Works that explicitly demonstrate }\label{table:relatedwork_port}
+% \vspace{25px}
+% {
+% \resizebox{\columnwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|l|l|l|l|}
+% Literature & \begin{rotate}{50}($\uparrow\theta_{min}$, $\phi_{min}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{min}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{max}$)\end{rotate} & \begin{rotate}{50}($\downarrow\theta_{max}$, $\phi_{back}$)\end{rotate} & \begin{rotate}{50}($\uparrow\theta_{max}$, $\phi_{back}$)\end{rotate} & \begin{rotate}{50}Cross-Board\end{rotate} & \begin{rotate}{50}Class. \%\end{rotate} & \begin{rotate}{50}Class. Loss\end{rotate} & \begin{rotate}{50}Class. Gain\end{rotate} & \begin{rotate}{50}GSR@50K\end{rotate} & \begin{rotate}{50}PSR@50K\end{rotate} & \begin{rotate}{50}PGE@50K\end{rotate} & \begin{rotate}{50}PGE@50K Gain\end{rotate} \\
+% \hline
+% \cite{gobulukoglu2021dac,schellenberg2018inside,schellenberg2018remote, gnad2017voltage} & \cmark & &  &  &  &  & 32.146\% & 2.159 & $0\times$ & 0\% & (2\%, 15\%, 35\%) & (66, 101, 124) & $0\times$\\
+% \cite{favi200917ps,krautter2020cpamap,daigneault2011high,zick2013sensing,glamovcanin2020cloud,won2015dual} & & \cmark & & & & & 51.160\% & 1.644 & $1.591\times$ & NA & NA & NA & NA \\
+% This Work & \cmark & & & & & \cmark & 32.146\% & 2.159 & $0\times$ & 0\% & (2\%, 15\%, 35\%) & (66, 101, 124) & $0\times$\\
+% This Work & & \cmark & & & & \cmark & 51.160\% & 1.644 & $1.591\times$ & NA  & NA & NA & NA\hspace{8mm} \\
+% This Work & & & \cmark & & & \cmark & 75.788\% & 0.834 & $2.358\times$ & NA  & NA & NA & NA \\
+% This Work & & & & \cmark & & \cmark & 75.552\% & 0.733 & $2.350\times$ & NA  & NA & NA & NA\\
+% This Work & & & & & \cmark & \cmark & 80.943\% & 0.668 & $2.518\times$ & 4\% & (12\%, 46\%, 90\%)& (3, 46, 73) & $2.2\times$
+% \end{tabular}}
+% }
+% \vspace{-10pt}
+% \end{table*}
+
+To the best of our knowledge, there is no prior work demonstrating $\phi$ as we have done in Section~\ref{target_clock_tuning}. Alternative solutions that increase the sampling frequency of TDCs can reduce the importance of $\phi$ tuning (by increasing the likelihood a transition falls when there is activity in the PDN); this remains imprecise and limited as co-tenant frequency increases.
+
+% No prior work incorporates a target computation tuning capability ($\phi$) or provides a demonstration of cross-platform support. The authors of \cite{krautter2020cpamap} mention that equivalent resources are available to implement their sensor architecture on Intel, but do not provide implementation details. The authors of \cite{udugama2022viti} claim their sensor design could be migrated from AMD to Intel using equivalent programmable IO delay resources. However, programmable IO delay elements on Intel are not dynamically configurable as they are on Xilinx.
+
+Table \ref{table:relatedwork_port} shows the targeted vendor and vendor IPs used in several related works. We note that only one prior work, \cite{udugama2022viti}, incorporates \sensor portability as a design objective. In this work, the authors demonstrate an RTL-compatible delay line. However, to calibrate the sensor on Intel, the authors suggest that the VITI sensor design could take advantage of the programmable IOE delay elements included on Intel FPGAs. However, unlike AMD programmable I/O delay elements, Intel programmable IOE delay elements are configured before design synthesis and do not allow for dynamic adjustments at runtime. This restriction would significantly diminish the tuning capabilities of the VITI implementation on Intel devices. All prior works take advantage of vendor proprietary IP, or device specific macros (i.e. Intel PLL dynamic reconfiguration IP, AMD MMCM, Intel LCELL, and AMD CARRY4/8). To the best of our knowledge, no prior work demonstrates sensor migration to an alternative vendor platform. Our work provides both a demonstrated implementation of sensor migration and tuning details for both Intel and AMD platforms. While we do make use of vendor IP, we describe equivalent IPs where necessary. We demonstrate feature parity between our two sensor implementations and our PLL configuration prepossessing algorithm allows our sensor to maintain adequate tuning resolution between vendors.
+
+\paragraph{\textbf{Mitigations: }}
+Physical isolation of co-tenants on the FPGA programmable logic~\cite{huffmire2007moats, mclean2007fpga} mitigates attacks that require close physical access~\cite{giechaskiel2018leaky, ramesh2018fpga}. 
+Many remote attacks do not have such constraints on sensor placement~\cite{zhao2018fpga, schellenberg2018inside}. 
+Our work reduces the benefits of physical isolation with a sensor designed to improve the signal-to-noise ratio through $\phi$ and $\theta$ optimization.
+
+Active fences surround the co-tenant IP core with ring oscillators or other heavy-power-draw circuits ~\cite{krautter2019active}, which induces noise into the PDN, making it harder to extract the signal. These techniques increase power and area consumption. 
+Our sensor improves the signal-to-noise ratio making attacks more effective, through $\phi$ and $\theta$ optimization, as demonstrated in our results.
+
+Krautter et al.~\cite{krautter2019mitigating} describe techniques that check the design for structures that resemble side-channel sensors.
+They focus on detecting sensors using ring oscillators, those that induce timing violations, data to clock paths, and high fanouts, which they argue are indicative circuits used in these threat models. 
+Our sensor is resistant to these detection techniques as it has low fanout, no timing violations, and no combinational loops.
+
+\begin{table*}[t!]
+\centering
+\caption{Summary of vendor IP used in prior work. Both AMD and Intel FPGA \sensors have been explored in a number of prior works. These works take advantage of vendor IP components for the construction of the tapped delay line (TDL) and TDL calibration $\theta$ mechanism. Prior work using these vendor IPs and device primitives have not provided clear guidance on migrating sensors between vendors. Asterisks indicate that the work mentions, but does not demonstrate, vendor migration. ``A-" and ``I-" indicate AMD or Intel IP/primitive cells, respectively. LCELL corresponds to logic cell primitives. CARRY4 and CARRY8 corresponds to carry primitives of length 4 and 8, respectively. IODELAY corresponds to programmable I/O delay and control elements. MMCM and PLLDR correspond to dynamic PLL reconfiguration IPs.}\label{table:relatedwork_port}
+{
+\resizebox{\columnwidth}{!}{\begin{tabular}{|l|l|l|l|l|l|}
+\centering Literature & AMD & Intel & TDL & $\theta$ tuning & $\phi$ tuning \\
+\hline
+\cite{daigneault2011high}     & \cmark   &     & A-CARRY4             & A-ROUTE                  & NA  \\
+\cite{favi200917ps}           & \cmark   &     & A-CARRY4             & A-CARRY4                 & NA  \\
+\cite{glamovcanin2020cloud}   & \cmark   &     & A-CARRY8             & A-MMCM/CARRY-8           & NA  \\
+\cite{gnad2017voltage}        & \cmark   &     & A-CARRY4             & A-CARRY4                 & NA \\
+\cite{gobulukoglu2021dac}     & \cmark   &     & A-CARRY4             & A-MMCM                   & NA \\
+\cite{krautter2020cpamap}     & \cmark   &     & A-CARRY4*            & A-CARRY4*                & NA \\
+\cite{schellenberg2018inside} & \cmark   &     & A-CARRY4             & A-LUT                    & NA \\
+\cite{schellenberg2018remote} & \cmark   &     & A-CARRY4             & A-LUT                    & NA \\
+\cite{won2015dual}            & \cmark   &     & A-CARRY4             & A-MMCM/CUSTOM            & NA \\
+\cite{zick2013sensing}        & \cmark   &     & A-CARRY4             & A-LUT/LATCH              & NA \\
+\cite{charlot2021high}        &   & \cmark     & I-LCELL              & I-PLLDR                  & NA \\
+\cite{khaddour2020design}     &   & \cmark     & I-LCELL              & NONE                     & NA \\
+\cite{elnaggar2021opal}       &   & \cmark     & I-LCELL              & ?                        & NA \\
+\cite{udugama2022viti}        & \cmark   & *    & RTL*                 & A-IODELAY*              & NA \\
+This Work                     & \cmark   & \cmark     & A-CARRY4/8 \& I-LCELL & A-MMCM \& I-PLLDR         & A-MMCM \& I-PLLDR   \\
+\hline   
+\end{tabular}}
+}
+\vspace{-12pt}
+\end{table*}
+
+% Yazdanshenas et al.~\cite{yazdanshenas2019costs} considers defenses against long wire crosstalk attacks in the context of multi-tenant execution.
+% Their approach relies on encrypting the data before transmitting outside of isolated region.
+% While this helps defend against some attacks~\cite{giechaskiel2018leaky, ramesh2018fpga}, it is still susceptible to attacks that do not require such proximity to the susceptible computation, e.g.,~\cite{zhao2018fpga, schellenberg2018remote}.
+
+% \paragraph{\textbf{Other TDC Applications:}}
+% \cite{won2015dual, maatta1998tof} \dr{Expand or remove}
+
+
+
+%\end{comment}
+
+\begin{comment}
+Completed
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5738332&casa_token=T4qX-HZLQV8AAAAA:-kUXTxVOuEBwSuj4EEi1dqwHJwYyA8_aL3Qp3XdSwtjoANftMh_ZTITG3PXsklohPXYEfESFfFU
+- Dynamic reconfiguration is more challenging and difficult " precise adjustment of each delay can be made using dynamic reconfiguration by modifying the routing of each interconnection"
+- Takes longer so cant adjust to rapidly changing conditions
+- Uses external oscillators
+- This is a different strategy with different intent
+- AWS does not expose partial reconfiguration to the user, though it is leveraged heavily to create their own infrastructure
+\end{comment}
+
+\begin{comment}
+Completed
+%https://dl.acm.org/doi/pdf/10.1145/2435264.2435283?casa_token=wWU-HGSxIXkAAAAA:rTrTRCn4Eefa70LUPWUKt-0-T1RvFtRohG6kIULqw96ElxJgeSE4PwQk6UV6DgKYT0z17rx0Tlut3A
+- Does propose using clock adjustment phase shifting to adjust theta/the path length at runtime
+- Do not use it to characterize the variability's within the delay line 
+- Nor discussion of its use in avoiding carry-chain irregularities 
+- There is no consideration of phi tuning using this strategy
+\end{comment}
+
+\begin{comment}
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=5485143&casa_token=0e5uoITJ6fcAAAAA:egUN6R0fr4DZbRIR5Hl7D_Iwl1TCzDeevRaOqnuiRIlwpUfr95jGGyfRFkw5cNfMU7EaFZUD6i0&tag=1
+Jinyuan Wu "Several Key Issues..."
+\end{comment}
+
+\begin{comment}
+To the best of our knowledge there is not prior work on phi tuning?
+\end{comment}
+
+\begin{comment}
+Completed
+\cite{krautter2020cpamap}
+- Proposes "An issue with these kind of sensors motivates an adjusted design. It is usually not
+possible to know how long the path is supposed to be at design time, since both intra-die
+and inter-die manufacturing process variation can be significant."
+- "In Fine Calibration slices, we allow the clock ‘clk’ to enter a Xilinx CARRY4 primitive
+(c.f. [Xil16]) at various depths of the delay line, by connecting it to all possible inputs
+that can be selected with multiplexers. Since the clock tree is balanced before the clock
+is connected to the CARRY4, the selection scheme allows for varying the path length in
+small steps"
+- Only for theta, moving a single input up only results in 12ps offset in Xilinx 6-series, can take many thousands of ps offset to do appropriate phi tuning -- not a viable strategy
+\end{comment}
+
+\begin{comment}
+Completed
+% https://ieeexplore.ieee.org/stamp/stamp.jsp?arnumber=9116481&casa_token=jmACTVTy9FsAAAAA:oEpG19FXm-rEDztQYTVSmCC7_9jfGiKOhlHqiYmDuntVtIZlceQuYn5qt1S3iypwTxPKL2hne3E&tag=1
+\cite{TODO}
+- Note that "delay-line time-to-digital converter and adapted it to be tolerant to look-ahead carry chains (used in the Xilinx Virtex Ultrascale+ FPGA architecture of the Amazon EC2 F1 instances), which, unlike ripple-carry carry chains, do not have monotonic delay increase at their outputs"
+- In particular they note the carry8 components suffer from this
+- "The main challenge that we discovered while implementing the sensor on the Amazon EC2 F1 instance is that the delays of the CARRY8 outputs do not increase monotonically."
+- Only alternates between 5 select values -- the irregularities between carry4 are less important
+- Permute the values of the internal carry8 values, but not considering what a static power draw may cause in transition location -- so don't really need to consider this
+\end{comment}
+
+
+\begin{comment}
+Completed
+% https://dl.acm.org/doi/pdf/10.1145/1508128.1508145?casa_token=-Zsy2XU5qgAAAAAA:T4c8R7GvXUFA8xcBfMwviubrhhB4VPJxViMC1vyn7D2KSZDpP_qu_JBmJysY9ChSiogOly0FO_kCdA
+\cite{favi200917ps} 
+- "propagation inside the carry4 structure is not uniform" 
+- the TDC proposed has a proposed method for compensating for process, voltage, and temperature (PVT)
+    - "In case of temperature variations, each delay element will get faster or slower, thus the same range will require a lower or higher number of delay elements. To maintain the same resolution, the raw codes are mapped to the correct time difference using an appropriate table whereby inter-value interpolations may be used. The same technique can be used when migrating the TDC configuration from one FPGA to another and from one power supply to another, so as to achieve PVT independence" 
+- Requires prior knowledge of voltage and temperature conditions, not available in cloud
+- Limited if transitions never enter the delay element to begin with!
+- Very different intent--aims to maintain the ps resolution of the sensor
+\end{comment}
+
+
+\begin{comment}
+\subsection{Voltage Fluctuation Sensors}
+\label{voltage_fluctuation_sensors}
+The flexibility of FPGAs fabrics allow attackers to implement a variety of circuits that can be used to measure voltage fluctuations in the power distribution network.
+Two types of \sensors are common in literature:
+
+\textit{Time-to-Digital Converters (TDCs)} measure the propagation delay of a signal in a digital circuit and convert it to a digital value~\cite{zick2013sensing}.
+TDC sensors can be implemented using a series of linear delay elements implemented in FPGA logic.
+Most implementations use the fast-carry chain structure provided by an FPGA.
+The regular routing and circuit characteristics create a semi-linear propagation delay medium that eliminates routing path inconsistencies that lead to non-linear delays \cite{aloisio2008high}.
+The propagation of a signal through the carry chain is captured as a digital value and analyzed.
+The speed of propagation is a function of the voltage of the power distribution network.
+As the voltage on the FPGA power-grid fluctuates due to the environment, the number of delay elements that a pulse traverses will vary, and a series of measurements produces a signal that reflects the voltage environment of the FPGA over time.
+
+\rk{not sure how much we need to discuss ROs. Not really a focus of our paper.}
+\textit{Ring Oscillators (ROs)} are another type of \sensor~\cite{boemo1997thermal, zick2012low}.
+ROs are metastable circuits implemented in the FPGA fabric that alternate between 0 and 1.
+Every transition causes an attached counter to increment.
+The oscillation frequency is a function of the voltage of the FPGA power grid, and affects the rate of the counter.
+An attacker can track voltage fluctuations by measuring the changes in oscillator-driven counter value over time.
+\end{comment}

@@ -1,0 +1,46 @@
+
+\ssection{Introduction}
+Resistive random access memory (ReRAM) is one of the most well-studied emerging memory technologies. Commercially available ReRAM devices target embedded data storage applications \cite{ramxeedreramproducts}.
+% Oxide-based ReRAM (OxRAM) devices are compatible with modern CMOS process technologies and can be integrated at the back-end of line (BEOL) enabling several recent commercial deployments \cite{ramxeedreramproducts}.
+ReRAM is also proposed for neuromorphic computing \cite{sung2018perspective}, compute-in-memory \cite{ielmini2018memory}, hardware roots of trust \cite{pang2019memristors}, and other emerging applications \cite{nirmal2024advancements}.
+
+%Numerous ReRAM device stacks and array architectures have been proposed to balance performance, density, and reliability demands \cite{li2021memristive} of these domains.
+
+% ReRAM devices are integrated into dense crossbar arrays.
+% Numerous ReRAM device stacks and array architectures have been proposed to balance performance, density and reliability demands \cite{li2021memristive}.
+% ReRAM switching is a stochastic process. Control logic in ReRAM memories accommodate this stochastic behavior by implementing non-deterministic program-verify loops which repeatedly attempt each write and perform checks until the operation succeeds \cite{yu2016resistive, ielmini2025resistive}.
+% Asymmetries in ReRAM device physics often require that these programming sequences  \cite{yu2016resistive}. 
+
+% Writing ReRAM bitcells is a stochastic process that differs significantly from conventional memory technologies. 
+% Cells typically require program-verify (PV) loops and to maintain stable bipolar switching \cite{yu2012switching, hayakawa2017resolving, fukuyama2019comprehensive, milo2021accurate}.
+% Control logic in ReRAM memories accommodate this stochastic behavior by implementing non-deterministic program-verify loops which repeatedly attempt each write and perform checks until the operation succeeds \cite{yu2016resistive, ielmini2025resistive}.
+
+ReRAM operation differs significantly from conventional memory technologies.
+Write operations construct and destroy a conductive filament.
+This operation is stochastic, so architectures use a ``program-verify'' (PV) loop that repeats a write operation until it produces a filament that is within specification~\cite{yu2012switching, hayakawa2017resolving, fukuyama2019comprehensive, milo2021accurate}.
+Numerous ReRAM device stacks, programming sequences, and array architectures have been proposed to balance performance, density, and endurance demands \cite{li2021memristive}.
+In addition, error correcting codes (ECC) have also been proposed and applied to improve reliability in both ReRAM memory and compute-in-memory arrays \cite{hayakawa2017resolving, golonzka2019non, crafton2021cim, li202240nm}.
+
+% However, repeated write operations 
+% Control logic in ReRAM memories accommodate this stochastic behavior by implementing non-deterministic program-verify loops which repeatedly attempt each write and perform checks until the operation succeeds \cite{yu2016resistive, ielmini2025resistive}.
+
+% ReRAM devices suffer from unique failure mechanisms \cite{chen2011physical, wang2015relaxation, fukuyama2019comprehensive} that affect reliability.
+
+Recent works have investigated commercial ReRAM memories for use in harsh environments, reporting varying degrees of reliability and radiation tolerance \cite{yang2014reliability, bi2019total, lyu2021research, korkian2022single}. The stochastic programming latency of commercial ReRAM has been investigated as an entropy source for true random-number generators (TRNGs), and physically uncloneable functions (PUFs). However, these works report the presence of a timing bias, requiring post-processing to produce the entropy required for security primitives \cite{suri2018high, tolga2024trng}.
+
+Vendors do not disclose the ECC structures used in commercial products, making it difficult to interpret reliability studies. 
+Furthermore, the combination of ECC and stochastic write behavior create subtle implications for security. While stochastic write behavior enables unclonable functions~, and random number generators, prior studies have also shown that asymmetries in ReRAM switching dynamics and crossbar access times can enable timing side-channels \cite{kommareddy2019crossbar, khan2021comprehensive, wang2023side}. 
+Embedded ECCs complicate security analyses when the ECC mechanism is undocumented. 
+
+% additional, data-dependent transitions that further perturb program-verify timing, complicating such analyses when the ECC mechanism is undocumented.
+
+% From a security perspective, prior studies have demonstrated that asymmetries in ReRAM switching dynamics and crossbar access times can enable timing side-channels \cite{kommareddy2019crossbar, khan2021comprehensive, wang2023side}. However, embedded ECCs introduce additional, data-dependent bit transitions, which can perturb the timing of ReRAM arrays. Assessing such vulnerabilities becomes difficult when undocumented ECC mechanisms obscure or distort the raw latency characteristics.
+
+To address these challenges, we introduce BREW-RC \footnote{\href{https://github.com/tsheaves/brew-rc}{https://github.com/tsheaves/brew-rc}} (\underline{B}it-exact \underline{R}ecovery of \underline{E}CC from \underline{W}rite Timing in \underline{R}eRAM \underline{C}rossbars). We draw inspiration from BEER \cite{patel2020bit}, which reverse engineers ECC parity matrices from commercial DRAM products through injected errors. Our work recovers the exact ECC parity submatrix of a target ReRAM memory through timing side-channels inherent to crossbar architectures. 
+
+% Like BEER, BREW-RC is able to recover the exact ECC parity submatrix of a target ReRAM memory. However, BREW-RC achieves this purely through the use of a timing side-channel inherent to many crossbar architectures. 
+
+This work makes three contributions: (1) we identify, and experimentally characterize, an undocumented timing side-channel in commercial ReRAM devices arising from ECC parity-bit activity; (2) we introduce BREW-RC, the first technique to recover the bit-exact parity submatrix of an on-die ReRAM ECC using only write-access timing, without physical probing or device modification; and (3) we show that the recovered parity submatrix accurately predicts the write-latency distributions observed in commercial devices, enabling more precise timing models for side-channel analysis and for  parity-driven timing perturbations in deployed ReRAM products.
+
+% Exploiting this side-channel requires only write access and latency measurement, requiring no physical device modifications or violations of manufacturer specifications. 
+% In this work we characterize this timing side-channel in detail and develop an ECC extraction technique based on its properties. We then demonstrate full ECC recovery on two commercial ReRAM products and compare our approach to prior studies.

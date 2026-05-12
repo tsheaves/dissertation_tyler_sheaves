@@ -1,0 +1,9 @@
+modifyLineBreaks:
+  textWrapOptions:
+    columns: 73
+    comments:
+      wrap: 1
+    blocksBeginWith:
+      A-Z: 1
+      a-z: 1
+      other: "\\\\[a-zA-Z]"

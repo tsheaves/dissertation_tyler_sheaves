@@ -1,0 +1,31 @@
+\label{chap:trng}
+
+Chapter~\ref{chap:brewrc} demonstrated that embedded ECCs dominate the
+observable write latency distributions of commercial ReRAM devices and
+that the bit-exact ECC parity submatrix is recoverable through
+non-invasive timing analysis. This chapter applies that structural
+knowledge to the problem of entropy harvesting from commercial
+off-the-shelf (COTS) ReRAM. Prior works on ReRAM-based TRNGs applied
+aggressive debiasing to suppress structured variance of unknown origin,
+limiting throughput and obscuring the true entropy of the devices. This
+chapter shows that the structured variance is fully explained by ECC
+activity, that isolating the deterministic ECC contribution from the
+underlying stochastic filament dynamics enables rigorous entropy
+characterization, and that the resulting TRNG substantially outperforms
+prior ECC-unaware approaches. The chapter makes three contributions.
+First, it demonstrates that prior entropy claims for commercial ReRAM
+TRNGs are overstated because ECC-driven timing perturbations were
+conflated with stochastic device behavior. Second, it introduces an
+ECC-aware framework for constructing and evaluating stationary,
+wear-leveled entropy sources in commercial ReRAM, including
+characterization of device aging effects on entropy yield. Third, it
+presents a complete TRNG pipeline that passes NIST SP~800-90B,
+SP~800-22, and PractRand, achieving 17$\times$ throughput improvement
+over prior methods. Section~\ref{sec:trng-structural} presents
+experiments confirming that prior structural biases in commercial ReRAM
+timing are fully explained by ECC activity.
+Section~\ref{sec:trng-optimization} describes the optimization of
+bursted, wear-leveled measurement sequences for maximum entropy yield.
+Section~\ref{sec:trng-implementation} presents the complete TRNG
+implementation pipeline. Section~\ref{sec:trng-results} presents entropy
+estimation and statistical validation results.
