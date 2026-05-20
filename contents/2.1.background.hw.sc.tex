@@ -1,0 +1,77 @@
+\section{Hardware Side-Channels and Pentimenti}
+\label{sec:bg-sidechannels}
+
+Hardware side-channels are unintended information channels that arise
+from the physical implementation of computing systems
+\cite{spreitzer2017systematic, hu2020overview}. The most well-studied of
+these vulnerabilities are cache side-channel attacks which exploit CPU
+microarchitectures allowing information to leak between users from
+shared caches in multi-tenant environments~\cite{yarom2014flush,
+	lipp2018meltdown, kocher2020spectre}. Generally, hardware side-channels
+exploit physical phenomena that correlate with sensitive on-chip
+activity~\cite{wei2020scoverview, nordholt2020hardware}. Classical
+examples include power-analysis attacks that recover cryptographic keys
+from power measurements or electromagnetic
+measurements~\cite{kocher1999differential, mangard2007power,
+	clavier2014practical, quisquater2001electromagnetic, agrawal2002side},,
+and timing attacks that exploit data-dependent execution
+latency~\cite{kocher1996timing, brumley2005remote}. Each class shares
+the property that sensitive information is transmitted through a leakage
+channel that the device manufacturer did not intend to expose, and each
+has motivated a corresponding body of countermeasure research~\cite{
+	barthe2018secure, ahmadi2023shield, zhang2024timing}.
+
+The growth of cloud and edge deployments has substantially expanded the
+attack surface for hardware side-channels. In multi-tenant cloud
+infrastructure, users share physical hardware either concurrently
+(\emph{spatial} co-tenancy) or sequentially over time (\emph{temporal}
+co-tenancy)~\cite{ristenpart2009hey, zhang2014cloud, zhang2012crossvm}.
+Spatial co-tenancy on shared FPGAs has been exploited extensively
+through on-chip voltage-fluctuation sensors that recover sensitive
+computation from co-located tenants~\cite{schellenberg2018remote,
+	zhao2018fpga, gnad2017voltage, gnad2016analysis, schellenberg2018inside,
+	ramesh2018fpga, giechaskiel2018leaky, giechaskiel2019leakier}. These
+sensors form the basis of remote power-analysis attacks against
+cryptographic accelerators and machine-learning workloads sharing the
+fabric~\cite{schellenberg2018remote, gobulukoglu2021dac, kim2019make,
+	mukhtar2018machine, bnn_power_side_channel}. Active denial-of-service
+attacks have also been demonstrated through power-wasting circuits that
+fault or reset co-tenant workloads~\cite{provelengios2020power,
+	krautter2018fpgahammer, krautter2019active, krautter2019mitigating,
+	nassar2021loopbreaker}. Edge platforms, with their more direct physical
+accessibility, face analogous threats to embedded sensitive IP and user
+data~\cite{tramer2016stealing, clements2022hardware, hu2016hardware,
+	lu2020comprehensive}.
+
+Temporal co-tenancy was recognized as a distinct threat more recently.
+The defining characteristic of a temporal side-channel is that no
+interaction between victim and adversary occurs during the victim's
+execution: information leaks through residual physical state left behind
+after the victim relinquishes the hardware. Existing demonstrations have
+exploited thermal signatures that persisted across tenant
+transitions~\cite{tian2019temporal}, residual charge in DRAM
+cells~\cite{geist2020dram}, and BTI-induced wearout in FPGA routing
+resources~\cite{drewes2024pentimento}. The last of these falls within
+the attack class addressed in this dissertation.
+
+Pentimenti are residual signatures left in the physical state of CMOS
+transistors after they have carried sensitive
+information~\cite{drewes2024pentimento}. The term is borrowed from the
+art-historical practice of revealing earlier compositions beneath
+finished paintings through X-ray or infrared imaging: just as a
+painting's surface can hide traces of prior brushstrokes, a
+semiconductor device's logical state can hide traces of prior internal
+data. The mechanism underlying pentimenti is bias temperature
+instability (BTI), a recoverable wearout phenomenon described in
+Section~\ref{sec:bg-bti}. With sufficiently sensitive on-chip timing
+instrumentation, the BTI-induced shifts in transistor switching time can
+be measured and inverted to recover information about the bias history
+of individual transistors, and the data those transistors carried. Prior
+demonstrations of pentimenti recovery~\cite{drewes2024pentimento} have
+established the attack only in the reconfigurable routing logic of
+Xilinx FPGAs, where high-resolution phase-shift primitives provide the
+timing precision required (Section~\ref{sec:bg-tdc}). Whether the attack
+class and measurement techniques extend to other FPGA vendors, and more
+broadly to other semiconductor device families whose physics involve
+analogous defect dynamics, is the central question motivating this
+dissertation.

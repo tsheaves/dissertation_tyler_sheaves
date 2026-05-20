@@ -31,9 +31,10 @@ configurations explored the bursting space under a diversity of stimuli
 (subsequent bursts are rotated by a single word independent of burst
 size). Under the runtime sequence, fixed-width bursts at burst-aligned
 offsets within the reserved 256\,B region collapse nearly all write
-latency variance. This sensitivity to stimulus disqualifies the 4M as a
-viable TRNG platform and exposes a fundamental limitation of
-characterization-only entropy evaluations.
+latency variance. This sensitivity disqualifies the 4M as a viable TRNG
+platform under a purely DHD characterization. However, it does motivate
+future investigations into why the effects of burst patterns padded with
+redundant, non-transitioning words influence entropy.
 
 \input{contents/ICCAD_2026/tables/nist-90b-all-chips}
 
@@ -49,12 +50,10 @@ characterization. The 55\textdegree{}C result suggests thermal
 activation provides a real but bounded boost to filament stochasticity.
 The contrast with the 4M device is attributed to burst complexity. The
 8M crossbar is driven with 32-word bursts while the 4M uses 4-word
-bursts. The longer burst aggregates more switching events per
-transaction, increasing thermal heterogeneity across bitcells and
-reducing the degree to which any individual filament's history can
-dominate the aggregate latency measurement. This suggests a minimum
-burst complexity threshold below which the single-stimulus feedback loop
-is not broken by accumulated stochastic contributions from other cells.
+bursts. The longer burst sequence aggregates more switching events per
+transaction, and while a lower min-entropy is observed than that of the
+characterization sequence, the final entropy of the TRNG is
+significantly improved over prior methods.
 
 \input{contents/ICCAD_2026/tables/trng-tests-8m}
 
@@ -80,11 +79,54 @@ patterns followed by aggressive von Neumann
 debiasing~\cite{von1963various}. The structural latency component
 removed in Section~\ref{sec:trng-structural} was on the order of tenths
 of a millisecond, while the timer resolution used
-in~\cite{tolga2024trng} likely operated at the MHz level. The present
-work confirms that under the more conservative fixed-sequence regime
-demanded by a stationary entropy source evaluation, the 4M device cannot
-sustain an exploitable entropy rate. ECC knowledge is necessary but not
-sufficient for an efficient COTS ReRAM TRNG; the underlying crossbar
-architecture must not dominate timing behavior at the chosen burst
-configuration, and runtime evaluation under the intended operational
-sequence is required.
+in~\cite{tolga2024trng} likely operated at the MHz level and under a Von
+Neuman debiasing the least-significant bit of timing measurments likely
+reflected true entropy. However, our results indicate that the 4M write
+latency is influenced not only by DHD, but also the context of the write
+operation. In the characterization experiment, bursts are rotated around
+the write buffer in an overlapping manner.
+
+The 8M device performs well in both characterization and runtime
+evaluation regimes showing similar entropy in both, and our methods
+demonstrate a significant performance improvement over all existing
+commercial ReRAM TRNGs.
+
+\subsubsection{Implications for ReRAM Pentimenti}
+
+The entropy of every commercial ReRAM module tested in this chapter was
+sensitive to cumulative wear. Because the codeword sequences used for
+measurement held DHD fixed, the switching composition presented to each
+cell remained constant across the experiment. The only property of the
+device that changed was the physical state of its conductive filaments.
+The drift in min-entropy observed across cycling therefore reflects
+filament degradation propagating through the program-verify loop and out
+to the memory interface as a measurable fluctuation in write latency.
+
+This is the same conceptual mechanism that FPGA Pentimenti attacks
+exploit in CMOS routing logic. In an FPGA, accumulated BTI stress shifts
+transistor threshold voltage. The shift in threshold voltage produces a
+shift in propagation delay, which a fine-grained on-chip TDC can
+resolve. In commercial ReRAM, cumulative cycling shifts filament
+morphology. The shift in morphology changes the number of program-verify
+iterations required to complete a write, which the device exposes
+through its write-completion handshake at the SPI interface. Both
+attacks observe a delay shift that depends on the cumulative bias
+history of the underlying device. They differ in the physical mechanism
+and in the measurement infrastructure required, but the structure of the
+leakage channel is the same.
+
+The TRNG presented in this chapter targeted raw entropy efficiency. Its
+codeword sequences were chosen to maximize switching activity per
+measurement and to balance wear evenly across the bits of each word. ECC
+knowledge supports a wider class of measurement protocols than the TRNG
+itself exercises. Without the parity submatrix, no externally applied
+write pattern can guarantee DHD properties at the codeword level, and no
+balanced wear sequence can be constructed at the bit granularity that
+filament defect dynamics operate on. With the parity submatrix, codeword
+sequences can be constructed that hold DHD fixed while varying the wear
+of individual bit positions. The same construction can concentrate
+cycling on a target cell while leaving its neighbors untouched, or it
+can isolate SET and RESET cycling histories independently. Future ReRAM
+Pentimenti work can evaluate the leakage channel under controlled
+defect-dynamics conditions rather than under the worst-case aggregation
+that prior entropy-source studies relied on.

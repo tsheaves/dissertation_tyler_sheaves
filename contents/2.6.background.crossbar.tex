@@ -20,13 +20,13 @@ operations can be applied within a crossbar array. SET and RESET
 operations require opposite voltage polarities across the switching
 layer, and the shared WL and BL rails of a crossbar architecture
 typically cannot apply both polarities simultaneously to different cells
-in the same word~\cite{xu2015overcoming}. As a result, write controllers
-must serialize SET and RESET phases: all cells requiring a SET
-transition within a word are programmed in one phase, and all cells
-requiring a RESET transition are programmed in a separate phase. A write
-operation that requires both polarities within a single word therefore
-incurs the latency of two sequential programming phases, while a write
-requiring only one polarity incurs a single phase.
+in the same word~\cite{xu2015overcoming, mao2016optimizing}. As a
+result, write controllers must serialize SET and RESET phases: all cells
+requiring a SET transition within a word are programmed in one phase,
+and all cells requiring a RESET transition are programmed in a separate
+phase. A write operation that requires both polarities within a single
+word therefore incurs the latency of two sequential programming phases,
+while a write requiring only one polarity incurs a single phase.
 
 The impact of polarity serialization on write latency can be
 characterized by the directional Hamming distance (DHD) of a codeword

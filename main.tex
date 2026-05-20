@@ -12,12 +12,6 @@
 	leqno, % put eq num to the left
 ]{scrbook} % Classes: scrartcl, scrreprt, scrbook
 
-\newcommand{\sensor}{voltage fluctuation sensor\xspace}
-\newcommand{\Sensor}{Voltage fluctuation sensor\xspace}
-\newcommand{\sensors}{voltage fluctuation sensors\xspace}
-\newcommand{\Sensors}{Voltage fluctuation sensors\xspace}
-\newcommand{\name}{Tunable Dual-Polarity\xspace}
-
 %
 %%-----------------------------------------
 %% Preambles
@@ -65,19 +59,26 @@
 	\tableofcontents
 	% \addchap{Figures and Tables} \listoffigures \listoftables
 \end{singlespace}
+
+\listoffigures
+
+\listoftables
+
 \begin{abstract}
 	\input{contents/0.1.abstract}
 \end{abstract}
 \begin{dedication}
 	\input{contents/0.2.dedication}
 \end{dedication}
-% \begin{acknowledgement} \input{contents/0.3.acknowledgements}
-% \end{acknowledgement}
+\begin{acknowledgement}
+	\input{contents/0.3.acknowledgements.tex}
+\end{acknowledgement}
 \addtocontents{toc}{\protect\vspace{15pt}}%
 % % Mainmatter
 \mainmatter
 \input{contents/1.intro}
 \input{contents/2.background}
+\input{contents/3.intel.tdc.tex}
 \input{contents/3.brewrc.tex}
 \input{contents/4.trng.tex}
 % \input{contents/5.reram.pentimenti.tex}

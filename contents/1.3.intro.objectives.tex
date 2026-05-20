@@ -1,32 +1,44 @@
 \section{Research Objectives and Contributions}
 \label{sec:objectives}
 
-\subsection{Research Objectives}
 This dissertation pursues four research objectives:
+
 \begin{enumerate}
-	\item \textbf{Characterize commercial ReRAM write latency.} Identify and
-	      experimentally validate the dominant structural factors that effect
+	\item \textbf{Broaden FPGA Pentimenti measurement across vendors.} We develop
+	      a constrained PLL configuration search that achieves the fine-grained
+	      timing resolution required for Pentimenti extraction on FPGAs that do
+	      not support fine-grained phase adjustments. We demonstrate these
+	      techniques on an Intel Cyclone V FPGA, closing the prior dependence on
+	      Xilinx-specific high-resolution phase shifting capabilities.
+	\item \textbf{Characterize commercial ReRAM write latency.} We identify and
+	      experimentally validate the dominant structural factors that affect
 	      write latency in commercial ReRAM crossbar memories, including crossbar
 	      architecture, embedded ECCs, and device aging.
-	\item \textbf{Recover hidden device architecture non-invasively.} Develop a
+	\item \textbf{Recover hidden device architecture non-invasively.} We develop a
 	      technique to recover the bit-exact ECC parity submatrix from commercial
 	      ReRAM products using only write-access timing, without physical probing
 	      or device modification.
-	\item \textbf{Apply structural knowledge to entropy characterization.}
-	      Demonstrate that ECC-aware analysis is necessary for rigorous
+	\item \textbf{Apply structural knowledge to entropy characterization.} We
+	      demonstrate that ECC-aware analysis is necessary for rigorous
 	      characterization of stochastic write latency, and construct entropy
 	      sources whose min-entropy can be evaluated under NIST SP 800-90B
-	      requirements.
-	      % \item \textbf{Establish a foundation for exploitable data remanence.}
-	      % Connect the timing channels characterized in this dissertation to the
-	      % broader class of hardware security threats that exploit physical device
-	      % state, and identify the conditions under which prior cell states in
-	      % commercial ReRAM may leave recoverable analog traces.
+	      requirements. In characterizing the entropy of write latency under
+	      various wear-levels, we identify the connection between write entropy
+	      and ReRAM filament degradation, providing a concrete demonstration that
+	      our measurement techniques are sensitive to conductive filament defect
+	      dynamics.
 \end{enumerate}
 
-\subsection{Contributions}
-
 This dissertation makes the following contributions:
+
+\paragraph{Cross-Vendor FPGA Pentimenti Sensor Implementation.}
+We present a vendor-agnostic implementation of FPGA Pentimenti sensors
+that closes the prior dependence on Xilinx-specific high-resolution PLL
+phase shifting capabilities. By reformulating fine-grained sensor tuning
+as a constrained PLL configuration search over valid PLL configurations
+we achieve the timing resolution required for Pentimenti extraction on
+Intel Cyclone V FPGAs. This broadens the FPGA platforms on which
+Pentimenti analysis is practical.
 
 \paragraph{Timing Side-Channel Characterization.}
 We present the first systematic characterization of write latency in
@@ -47,8 +59,8 @@ formulates ECC recovery as a SAT problem, deriving constraints from
 observed write latency distributions and recovering the complete
 generator matrix from two commercial products. The recovered matrix
 enables accurate timing models in the presence of embedded ECCs and is
-validated against results from destructive reverse engineering,
-achieving a perfect match under all valid bit orderings.
+validated against results from destructive reverse engineering
+techniques.
 
 \paragraph{ECC-Aware Entropy Harvesting.}
 We demonstrate that structured variance in commercial ReRAM write
@@ -62,13 +74,3 @@ characterize how device aging affects switching dynamics and entropy
 yield over device lifetime. The resulting TRNG passes NIST SP 800-22 and
 PractRand and achieves 17$\times$ throughput improvement over prior
 ECC-unaware methods.
-
-% \paragraph{Toward ReRAM Data Remanence.} We connect the timing channels
-% characterized in this dissertation to FPGA
-% Pentimenti~\cite{drewes2023pentimento}, a recently discovered class of
-% hardware security threats that recover prior device data through Bias
-% Temperature Instability effects on programmable routing. We identify
-% the structural and stochastic components established by this work as
-% necessary conditions for reasoning about whether prior cell states in
-% commercial ReRAM leave recoverable analog traces, and discuss the open
-% research challenges that remain.

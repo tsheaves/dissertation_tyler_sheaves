@@ -19,6 +19,7 @@ is computed for test vectors with identical $(w_{0\to1}, w_{1\to0})$
 tuples. The timing model for each device is defined as a lookup table
 keyed by DHD returning an expected median write time:
 \begin{equation}
+	\label{eq:timing-model}
 	\hat{t}_w(\delta) = \mathrm{Med}(t_w \mid \mathrm{DHD} = \delta).
 \end{equation}
 For comparison, a naïve timing model is generated using the same procedure but with dataword DHDs rather than codeword DHDs.
@@ -59,3 +60,34 @@ codewords and the parity bits reported by the authors; the next-best
 configuration has a distance of 18 bits. This result confirms agreement
 with destructive reverse engineering techniques and validates the
 bit-exact recovery claim of BREW-RC.
+
+\section{Implications for ReRAM Pentimenti}
+\label{sec:reram-pentimenti-implications}
+
+The primary obstacle to pentimenti-class analysis in commercial ReRAM
+has been the dominance of structural variance in observable write
+latency. Without knowledge of the embedded ECC, the codeword DHD of any
+given write is unknown, and any correlation between write latency and
+prior cell state, the observation a ReRAM Pentimenti attack would rely
+on, is confounded by ECC-driven DHD changes that no external observer
+can predict from the data word alone. The experiments of
+Section~\ref{sec:brewrc-investigation} demonstrate that a single-bit
+dataword transition into a non-uniformly initialized word produces a
+write latency distribution that overlaps with the bipolar transition
+cluster, because parity bit activity has promoted the unipolar dataword
+transition to a bipolar codeword transition. Without the parity
+submatrix, this promotion is invisible. BREW-RC eliminates the obstacle
+by recovering the parity submatrix from the same write-access timing
+that a ReRAM Pentimenti adversary already has available. With knowledge
+of the matrix, codeword-level DHD becomes computable, and the structural
+component of write latency is subtractable from the observed signal.
+
+The recovery of the parity submatrix also has consequences independent
+of any pentimenti applications. Vendors of commercial ReRAM products
+consider their ECC implementations to be trade
+secrets~\cite{patel2020bit}, and prior security and reliability analyses
+of these devices have necessarily treated the parity function as an
+unknown black box. BREW-RC shows that the obscurity is not a proxy for
+protection. The parity submatrices of both studied RAMXeed products may
+be recovered in less than an hour of measurement followed by a 10 minute
+parallel SAT search.

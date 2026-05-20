@@ -1,0 +1,90 @@
+\section{Bias Temperature Instability}
+\label{sec:bg-bti}
+
+Bias temperature instability (BTI) is the dominant transistor wearout
+mechanism in CMOS process nodes below 180~nm~\cite{novak2015intel14,
+	22nmTrigate, mahapatra2016fundamentals}. BTI manifests as a shift in
+transistor threshold voltage ($\Delta V_\text{th}$) under prolonged gate
+bias stress. Two complementary mechanisms are distinguished by polarity:
+\emph{negative} BTI (NBTI) affects PMOS transistors under negative
+$V_\text{GS}$ stress, while \emph{positive} BTI (PBTI) affects NMOS
+transistors under positive $V_\text{GS}$
+stress~\cite{schroder2003negative, mahapatra2016fundamentals,
+	amouri2014aging}. The relative contributions of NBTI and PBTI to
+transistor wearout depend strongly on the gate dielectric stack:
+high-$\kappa$/metal-gate processes used in nodes below 32~nm exhibit
+significant PBTI in NMOS devices, whereas earlier oxynitride-based
+processes were dominated by NBTI in
+PMOS~\cite{mahapatra2016fundamentals, novak2015intel14, 22nmTrigate}.
+The defects underlying both effects are believed to involve a
+combination of hydrogen-related traps and charge carriers in the gate
+dielectric~\cite{bti_modelling_2013, mahapatra2016fundamentals}.
+
+From the side-channel perspective, the feature that distinguishes BTI
+from other wearout mechanisms such as hot-carrier injection (HCI) and
+time-dependent dielectric breakdown (TDDB) is its partial
+recoverability. When the stressing bias is removed or reversed, $\Delta
+	V_\text{th}$ recovers toward its pre-stress value on time scales ranging
+from milliseconds to hours, depending on temperature and stress
+conditions~\cite{stott2010degradation, ramey2014bti, grasser2016PRNBTI,
+	bti_modelling_2013}. This stress-recovery asymmetry produces an
+observable signature of a transistor's recent bias history: a transistor
+that has been recently stressed exhibits a temporarily-elevated
+$V_\text{th}$ that is detectably distinct from one in its rested state.
+BTI also includes a permanent (non-recoverable) component that
+accumulates with cycling and saturates around 30~mV after $\sim 10^4$
+seconds of cumulative stress~\cite{grasser2011permanentifc,
+	grasser2016PRNBTI}. From a process-engineering perspective, the
+recoverable component dominates short-term reliability concerns, while
+the permanent component contributes to slow drift in transistor
+parameters over the device lifetime.
+
+Both reaction-diffusion (R-D) model and the more recent stochastic
+capture-emission framework~\cite{bti_modelling_2013,
+	mahapatra2016fundamentals} predict that $\Delta V_\text{th}$ follows a
+power law in cumulative stress time:
+\begin{equation}
+	\label{eqn:bti-powerlaw}
+	\Delta V_\text{th} = b \cdot \alpha^n \cdot t^n,
+\end{equation}
+where $b$ is a technology- and temperature-dependent constant,
+$\alpha$ is the duty cycle of bias stress, $n$ is a
+process-dependent BTI exponent typically in the range
+$0.1$--$0.25$, and $t$ is cumulative stress time~\cite{wang2007bti,
+	nunes2013ffbti, bti_modelling_2013}. $\Delta V_\text{th}$ propagates to a measurable shift in transistor
+switching delay. For an inverter, the dependence of propagation
+delay on accumulated BTI can be approximated as
+\begin{equation}
+	\label{eqn:bti-tp}
+	t_p = a_0 + a_1 \cdot \alpha^n \cdot t^n,
+\end{equation}
+where $a_0$ is the intrinsic gate delay and $a_1$ is a fitting
+parameter that depends on transistor sizing and the process node's
+sensitivity to $\Delta V_\text{th}$~\cite{wang2007bti,
+	nunes2013ffbti}. Process engineers typically target
+$\Delta V_\text{th} \leq 0.05 \cdot V_\text{DD}$ at five years of
+stress~\cite{taek2013bti, rzepa2018comphy}; for nodes below 32~nm
+this corresponds to propagation-delay shifts on the order of single
+picoseconds, comparable to the resolution of fine-grained
+time-to-digital converters implemented in FPGA soft logic
+(Section~\ref{sec:bg-tdc}).
+
+FPGAs are particularly well-suited to BTI measurement because their
+reconfigurable fabric permits arbitrary placement of fine-grained timing
+instrumentation that directly connects to the routing nets being
+probed~\cite{stott2010degradation, amouri2014aging,
+	drewes2024pentimento}. When a single bit of information is held in a
+routing net for an extended period, the aggregate BTI stress across all
+transistors carrying that bit accumulates, producing a propagation-delay
+shift detectable through on-chip timing measurement. Drewes et
+al.~\cite{drewes2024pentimento} demonstrated this principle as a
+temporal-multi-tenancy side-channel: an adversary co-located on a target
+FPGA after a victim's workload has completed can recover bits of
+information stored in routing nets by the prior tenant, even after the
+FPGA has been reconfigured. The attack relies on (i) BTI's recoverable
+component producing data-dependent delay shifts and (ii) the FPGA's TDC
+infrastructure resolving those shifts at picosecond granularity. Whether
+analogous defect dynamics in other device families, and in particular
+the filament-formation dynamics of ReRAM (Sections~\ref{sec:bg-oxram}
+and~\ref{sec:bg-defects}), support similar attacks is an open question
+that motivates the remainder of this dissertation.

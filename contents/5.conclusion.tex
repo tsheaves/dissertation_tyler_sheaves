@@ -1,3 +1,108 @@
 \chapter{Conclusion}
+
 \label{chap:conclusion}
 
+This dissertation develops the reverse-engineering and measurement
+infrastructure required to study pentimenti-class side-channels in
+commercial ReRAM. The central claim has been that observable write
+latency in commercial ReRAM decomposes into a structural component
+controlled by polarity serialization and embedded ECC activity, and a
+stochastic component controlled by conductive filament dynamics, and
+that both components are recoverable through non-invasive timing
+analysis alone. The three works compiled in this dissertation establish
+that claim, and in doing so they expose a defect-dynamics measurement
+channel in a device family for which no such channel was previously
+available.
+
+\section{Summary of Contributions}
+
+Chapter~\ref{chap:fpga-sensor} closes a vendor-specificity gap in FPGA
+Pentimenti measurement. By reformulating fine-grained sensor tuning as a
+constrained PLL configuration search, the dual-edge TDC achieves an
+average phase-step granularity of 1.6ps on Intel Cyclone~V, two orders
+of magnitude finer than the vendor-default 78.125ps floor and sufficient
+to resolve the picosecond-scale delay shifts characteristic of
+BTI-induced pentimenti. This broadens the FPGA platforms on which the
+attack class can be studied and removes the prior dependence on
+Xilinx-specific phase-shift primitives.
+
+Chapter~\ref{chap:brewrc} presents the first systematic characterization
+of write latency in commercial ReRAM crossbar memories and introduces
+BREW-RC, the first non-invasive technique for recovering the bit-exact
+ECC parity submatrix of a commercial ReRAM product from write timing
+alone. The four-experiment characterization identifies polarity
+serialization and ECC parity activity as the dominant sources of
+structured timing variance, motivates the directional Hamming distance
+as the natural unit of analysis, and produces the labelled observation
+classes from which BREW-RC's SAT formulation is derived. The recovered
+parity submatrices improve Pearson correlation between predicted and
+measured write latency from $0.203$ to $0.998$ on the MB85AS4MT and from
+$0.180$ to $0.553$ on the MB85AS8MT, and are validated bit-for-bit
+against an independent destructive reverse-engineering result on the
+MB85AS4MT.
+
+Chapter~\ref{chap:trng} applies the structural understanding from
+Chapter~\ref{chap:brewrc} to entropy harvesting in commercial
+off-the-shelf ReRAM. Subtracting the codeword-DHD timing model from
+measured single-byte transition latencies eliminates the Sierpinski-like
+structural pattern entirely, confirming that ECC activity is the sole
+source of structured variance in these devices and that prior entropy
+claims, which conflated ECC-driven perturbations with stochastic
+behavior, are correspondingly overstated. ECC-aware construction of
+wear-leveled, fixed-composition codeword sequences enables rigorous
+min-entropy estimation under NIST SP~800-90B, and the resulting TRNG
+passes SP~800-22 and PractRand while achieving a $17\times$ throughput
+improvement over prior ECC-unaware methods.
+
+Most importantly, the entropy-versus-wear characterization in
+\S\ref{sec:trng-results} demonstrates that under fixed codeword DHD,
+write-latency min-entropy varies systematically with per-bit cycling
+history. Because DHD is held constant, the observed entropy drift cannot
+be attributed to changes in switching composition, it reflects changes
+in the conductive filament itself. This is concrete evidence that the
+isolated stochastic component of write latency carries information about
+cumulative defect dynamics, the property that pentimenti-class analysis
+requires.
+
+\section{Implications for Deployed ReRAM Products}
+
+The findings of this dissertation have two immediate consequences for
+the security of deployed commercial ReRAM.
+
+First, the undocumented ECC structure of commercial ReRAM is not a
+defense. BREW-RC recovers the bit-exact parity submatrix from black-box
+write-access timing in a matter of hours of measurement and a parallel
+SAT search bounded by $k$. Any security argument that implicitly relied
+on the stochasticity of commercial ReRAM without ECC-awareness,
+including entropy claims for prior ReRAM TRNGs that did not account for
+codeword-level switching, must be revisited.
+
+Second, the write latency exposed at the memory interface leaks useful
+information. The DHD of the underlying codeword, not the user-visible
+data word, determines latency distribution membership. An adversary with
+knowledge of the ECC can recover information about the codeword being
+programmed, and with sufficient measurement budget can characterize the
+stochastic component associated with individual bitcells. Whether this
+is sufficient to recover data remanence from a prior user (the ReRAM
+analog of the FPGA Pentimenti attack) remains an open question.
+
+\section{Toward ReRAM Pentimenti}
+This dissertation establishes the measurement infrastructure for
+pentimenti analysis in commercial ReRAM, but it does not demonstrate
+ReRAM Pentimenti recovery itself. The wear-induced entropy drift result
+is necessary evidence that filament defect dynamics leak through the
+isolated stochastic timing component, but does not yet establish a
+recoverable signal analogous to the BTI-based component exploited by
+FPGA Pentimenti. A ReRAM pentimenti attack requires a recoverable signal
+that is data-dependent on the prior user's activity, persists, and
+survives reads or reprogramming by the adversary. Each of these
+properties must be characterized experimentally before the attack class
+can be said to extend to commercial ReRAM. Measurement of filament
+degradation is a first step toward this objective. Other measurement
+defect dynamics, such as the relaxation dynamics described in
+\S\ref{sec:bg-defects} suggest that the post-RESET HRS distribution
+carries a measurable dependence on the cell's most recent SET history,
+and that dependence is the natural ReRAM analog of the recoverable BTI
+component exploited in FPGA Pentimenti, future work is required to
+determine how this and similar pentimenti mechanisms could be detected
+under the measurement framework presented in this work.

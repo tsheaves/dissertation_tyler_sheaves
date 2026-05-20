@@ -1,19 +1,16 @@
 \begin{table}[t!]
-\setlength{\textfloatsep}{0pt}
-\setlength{\floatsep}{0pt}
-\centering
-\caption{SAT solver clause definitions \label{tab:polarity-clauses}.}
-\vspace{-.2cm}
-\renewcommand{\arraystretch}{1.1}
-\setlength{\tabcolsep}{3pt}
-\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc@{}}
-\toprule
-\textbf{Data label} $\ell_d$ & \textbf{Obs.} $\ell_{cw}$ & \textbf{Constraint} & \textbf{Description} \\
-\midrule
-\texttt{UNIPOLAR\_P} & \texttt{UNIPOLAR\_P} & $\forall j\, (p_{0,j}\vee\neg p_{1,j})$  & forbid \emph{neg}  \\
-\texttt{UNIPOLAR\_N} & \texttt{UNIPOLAR\_N} & $\forall j\, (\neg p_{0,j}\vee p_{1,j})$ & forbid \emph{pos} \\
-\texttt{UNIPOLAR\_P} & \texttt{BIPOLAR}     & $\bigvee_j \textit{neg}_j$               & require $\ge1$ \emph{neg}  \\
-\texttt{UNIPOLAR\_N} & \texttt{BIPOLAR}     & $\bigvee_j \textit{pos}_j$               & require $\ge1$ \emph{pos}  \\
-\bottomrule
-\end{tabular*}  
+	\centering
+	\caption{SAT solver clause definitions \label{tab:polarity-clauses}.}
+	\renewcommand{\arraystretch}{1.1}
+	\setlength{\tabcolsep}{3pt}
+	\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}lcccc@{}}
+		\toprule
+		\textbf{Data label} $\ell_d$ & \textbf{Obs.} $\ell_{cw}$ & \textbf{Constraint} & \textbf{Description} \\
+		\midrule
+		\texttt{UNIPOLAR\_P} & \texttt{UNIPOLAR\_P} & $\forall j\, (p_{0,j}\vee\neg p_{1,j})$  & forbid \emph{neg}  \\
+		\texttt{UNIPOLAR\_N} & \texttt{UNIPOLAR\_N} & $\forall j\, (\neg p_{0,j}\vee p_{1,j})$ & forbid \emph{pos} \\
+		\texttt{UNIPOLAR\_P} & \texttt{BIPOLAR}     & $\bigvee_j \textit{neg}_j$               & require $\ge1$ \emph{neg}  \\
+		\texttt{UNIPOLAR\_N} & \texttt{BIPOLAR}     & $\bigvee_j \textit{pos}_j$               & require $\ge1$ \emph{pos}  \\
+		\bottomrule
+	\end{tabular*}
 \end{table}

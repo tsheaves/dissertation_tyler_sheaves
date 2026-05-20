@@ -1,0 +1,51 @@
+\section{Program-Verify Loops and Write Latency}
+\label{sec:bg-pvloops}
+
+Because OxRAM switching is stochastic, resulting in a wide variety of CF
+states, a single programming pulse does not reliably bring a cell to a
+target resistance state. Commercial architectures employ a
+program-verify (PV) loop: a sequence of programming pulses interleaved
+with resistance measurements that continues until the cell resistance
+falls within a target window~\cite{
+	kawahara2013filament,hayakawa2015highly,grossi2015impact,mao2016optimizing,
+	milo2021accurate, hung2021mlc}. Each iteration of the loop applies a
+pulse and checks the result. If the cell has not reached the target
+state, another pulse is applied. The loop terminates when the cell
+resistance is confirmed to be within specification. Single-level cells
+(SLCs) define two resistance windows corresponding to logical 0 and 1,
+while multi-level cells (MLCs) require finer resistance windows and more
+sophisticated verification schemes but allow for the encoding of
+multiple bits per cell~\cite{hung2021mlc}.
+
+The non-deterministic completion time of a PV loop contributes to the
+write latency $t_w$ of commercial ReRAM memories. This stochastic timing
+contribution arises from cycle-to-cycle variability in filament
+switching dynamics. This variabilily effects the number of pulses
+required to grow or rupture a filament varies even under identical
+initial conditions ~\cite{yu2012switching, kawahara2013filament}. PV
+loops typically apply different different biases to each cell depending
+on the operation being performed. In 1T1R ReRAM arrays (described in the
+next section), these biases are chosen such that access transistors can
+serve as current compliance to avoid overshoots during SET operations.
+At the word-level, a single write operation may require both SETs and
+RESETs. In this case, the write controller will must serialize SET/RESET
+pulses at the cost of increased latency. Despite some simulated results
+that suggest word-level biases can be achieved without this
+serialization \cite{mao2016optimizing}, ReRAM studies using physical
+ReRAM typically calibrate SET and RESET pulses
+separately~\cite{hayakawa2017resolving}.
+
+The data-dependence of write latency has direct implications for timing
+side-channel analysis. Writes that require only SET transitions, only
+RESET transitions, a combination of both, or no transitions at all
+produce different latency distributions. In a crossbar architecture,
+writes that require both SET and RESET transitions within the same word
+incur additional serialization overhead, as described in
+Section~\ref{sec:bg-crossbar}. The presence of an on-die ECC further
+modifies the effective transition composition of every write, since
+parity bits computed over user data may require transitions that differ
+in polarity from the data transitions. The net result is that the write
+latency of a commercial ReRAM device encodes information about the
+codeword being written, not merely the user-visible data word. This
+relationship is the basis of the BREW-RC technique presented in
+Chapter~\ref{chap:brewrc}.

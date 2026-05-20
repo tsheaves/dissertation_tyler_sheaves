@@ -14,8 +14,6 @@ are used throughout.
 
 \input{contents/ICCAD_2026/figs/single-byte-sierpinski.tex}
 
-\input{contents/ICCAD_2026/figs/single-byte-sierpinski-model-residual.tex}
-
 Arul et al.~\cite{tolga2024trng} identified a Sierpinski-like pattern in
 single-byte transition latency heatmaps of the MB85AS4MT and attributed
 it to the bit-level polarity structure of data transitions. The
@@ -30,17 +28,19 @@ value to every final value. Each FROM/TO transition is repeated 10 times
 and the experiment is performed on all byte positions in 10 randomly
 selected words, on three modules each of 4M and 8M density.
 
-Figure~\ref{fig:sierpinski} (top) reproduces the Sierpinski-like pattern
-on both 4M and 8M devices, extending the result of~\cite{tolga2024trng}
-to the 8M for the first time. The ECC-aware timing model
+\input{contents/ICCAD_2026/figs/single-byte-sierpinski-model-residual.tex}
+
+Figure~\ref{fig:sierp-orig} reproduces the Sierpinski-like pattern on
+both 4M and 8M devices, extending the result of~\cite{tolga2024trng} to
+the 8M for the first time. The ECC-aware timing model
 $\hat{t}_w(\delta)$ (Equation~\ref{eq:timing-model}) is then used to
 predict the median latency for each byte transition by computing the
-codeword DHD using the recovered ECC. Figure~\ref{fig:sierpinski}
-(bottom) shows the residual heatmap after subtracting the predicted
-latency from the measured median latency. The structural pattern is
-completely eliminated, leaving only a noisy residual consistent with
-stochastic filament dynamics. This result confirms that ECC activity is
-the sole source of structured timing variance in these devices, and that
-TRNGs that do not account for the underlying ECC will overstate their
+codeword DHD using the recovered ECC. Figure~\ref{fig:sierp-resid} shows
+the residual heatmap after subtracting the predicted latency from the
+measured median latency. The structural pattern is completely
+eliminated, leaving only a noisy residual consistent with stochastic
+filament dynamics. This result confirms that ECC activity is the sole
+source of structured timing variance in these devices, and that TRNGs
+that do not account for the underlying ECC will overstate their
 harvested entropy.
 

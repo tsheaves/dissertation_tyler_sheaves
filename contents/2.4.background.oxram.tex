@@ -8,18 +8,18 @@ metal-insulator-metal (MIM) stack~\cite{wong2012metal,chen2020reram}.
 The switching layer is typically constructed from a transition metal
 oxide such as HfO$_2$ or Ta$_2$O$_5$, both of which are high-$\kappa$
 dielectrics already present in standard CMOS process
-flows~\cite{wong2012metal, chenReRAMHistory2020}. This process
-compatibility enables OxRAM devices to be integrated at the
-back-end-of-line (BEOL) alongside the upper metal layers of a
-semiconductor device, without modification to the front-end transistor
-process. OxRAM bitcells are formed at the intersections of wordlines
-(WLs) and bitlines (BLs) in a crossbar array, with an access transistor
-providing cell isolation~\cite{wong2012metal}.
+flows~\cite{wong2012metal, chen2020reram}. This process compatibility
+enables OxRAM devices to be integrated at the back-end-of-line (BEOL)
+alongside the upper metal layers of a semiconductor device, without
+modification to the front-end transistor process. OxRAM bitcells are
+formed at the intersections of wordlines (WLs) and bitlines (BLs) in a
+crossbar array, with an access transistor providing cell
+isolation~\cite{wong2012metal}.
 
 \input{fig/oxram_form_set_reset.tex}
 
-OxRAM devices operate in a bipolar switching regime, in which the
-polarity of the applied voltage determines whether the device
+OxRAM devices typically operate in a bipolar switching regime, in which
+the polarity of the applied voltage determines whether the device
 transitions to a low-resistance state (LRS) or a high-resistance state
 (HRS)~\cite{wong2012metal, chen2020reram}. A SET operation applies a
 positive voltage across the device, driving oxygen ions out of the
@@ -32,7 +32,7 @@ rupturing the CF and returning the device to the
 HRS~\cite{yu2012switching}. The LRS and HRS correspond to stored logical
 values and are distinguished by their resistance ratio
 $R_\text{OFF}/R_\text{ON}$, which is typically in the range of
-$10$--$10^3$ for commercial OxRAM devices~\cite{chenReRAMHistory2020}.
+$10$-$10^3$ for commercial OxRAM devices~\cite{chen2020reram}.
 
 The switching dynamics of OxRAM devices are controlled by the local
 electric field, the thermal profile of the device, and the stochastic
@@ -45,6 +45,7 @@ This asymmetry produces data-dependent differences in switching dynamics
 that are observable through write latency measurements. The stochastic
 nature of oxygen vacancy migration means that the number of programming
 pulses required to complete a transition varies from cycle to cycle,
-even under identical initial conditions~\cite{6582090, 6724732}. This
-cycle-to-cycle variability is the fundamental physical source of the
-timing entropy and side-channel signals studied in this dissertation.
+even under identical initial conditions~\cite{fantini2013intrinsic,
+	ambrogio2013understanding}. This cycle-to-cycle variability is the
+fundamental physical source of the timing entropy and side-channel
+signals studied in this dissertation.

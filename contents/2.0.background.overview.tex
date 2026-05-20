@@ -1,27 +1,41 @@
-\label{chap:background}
+This chapter provides the technical background for the work presented in
+the remainder of this dissertation. The material covers the general
+class of defect-dynamics side-channels, the specific FPGA case and its
+measurement requirements, the device physics, architecture, and
+reliability infrastructure of commercial ReRAM, and finally the entropy
+framework used to evaluate stochastic write timing.
 
-This chapter provides the technical background for the timing
-side-channel vulnerabilities and entropy characterization addressed in
-this dissertation. The material is organized to build from device
-physics to system-level behavior. Section~\ref{sec:bg-oxram} describes
-the device structure and switching physics of oxide-based ReRAM (OxRAM),
-covering bipolar switching, conductive filament formation and rupture,
-and the resistance states that encode stored data.
-Section~\ref{sec:bg-pvloops} describes the program-verify loop used to
-write OxRAM cells, explains the sources of write latency variability,
-and establishes why write latency is an observable that carries
-information about internal device state. Section~\ref{sec:bg-crossbar}
-describes the crossbar array architecture used in commercial OxRAM
-memories, covering wordline and bitline organization, the serialization
-constraints imposed by bipolar switching, and the effect of these
-constraints on word-level write latency. Section~\ref{sec:bg-defects}
-covers defect dynamics and wearout in OxRAM devices, describing how
-repeated cycling degrades switching behavior and how wearout manifests
-in write latency distributions. Section~\ref{sec:bg-ecc} provides
-background on linear block codes and error-correcting codes as used in
-commercial ReRAM memories, covering the generator matrix, parity
-submatrix, syndrome decoding, and code strength.
-Section~\ref{sec:bg-entropy} covers entropy sources and true random
-number generators, defining min-entropy, describing the NIST SP~800-90B
-evaluation framework, and introducing the statistical test suites used
-to validate conditioned output.
+Section~\ref{sec:bg-sidechannels} defines hardware side-channels and
+introduces \emph{pentimenti} as a recently recognized class of leakage
+channel that allows for the exploitation of BTI-driven defect dynamics
+in CMOS transistors. Section~\ref{sec:bg-bti} reviews the physics of
+bias temperature instability (BTI), including its reaction-diffusion and
+charge-trapping/detrapping dynamics, recovery characteristics, and
+propagation-delay impact. Section~\ref{sec:bg-tdc} describes the
+fine-grained time-to-digital converter (TDC) sensors used to extract
+pentimenti from FPGA routing logic, the role of phase-locked loop (PLL)
+phase shift granularity in determining sensor resolution, and the
+vendor-specific dependencies that have historically constrained FPGA
+pentimenti measurement to Xilinx products.
+
+Section~\ref{sec:bg-oxram} describes the device structure and switching
+physics of oxide-based ReRAM (OxRAM), covering bipolar switching,
+conductive filament formation and rupture, and the resistance states
+that encode stored data. Section~\ref{sec:bg-pvloops} describes the
+program-verify loop used to write OxRAM cells, explains the sources of
+write latency variability, and establishes why write latency is an
+observable that carries information about internal device state.
+Section~\ref{sec:bg-crossbar} describes the crossbar array architecture
+used in commercial OxRAM memories, covering wordline and bitline
+organization, the serialization constraints imposed by bipolar
+switching, and the effect of these constraints on word-level write
+latency. Section~\ref{sec:bg-defects} covers defect dynamics and wearout
+in OxRAM devices, describing how repeated cycling degrades switching
+behavior and how wearout manifests in write latency distributions.
+Section~\ref{sec:bg-ecc} provides background on linear block codes and
+error-correcting codes as used in commercial ReRAM memories, covering
+the generator matrix, parity submatrix, syndrome decoding, and code
+strength. Section~\ref{sec:bg-entropy} covers entropy sources and true
+random number generators, defining min-entropy, describing the NIST SP
+800-90B evaluation framework, and introducing the statistical test
+suites used to validate conditioned output.

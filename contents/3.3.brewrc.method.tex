@@ -5,9 +5,26 @@ entire codeword transitions. These distributions are labeled as:
 \begin{equation}
 	\ell_{cw},\, \ell_d \in \{\texttt{NONE},\, \texttt{UNIPOLAR\_P},\, \texttt{UNIPOLAR\_N},\, \texttt{BIPOLAR}\},
 \end{equation}
-where $\ell_{cw}$ reflects the codeword DHD and $\ell_d$ is the known transition polarity of the applied data. The relationship between the applied data label and the observed codeword label is written as $\ell_d \to \ell_{cw}$.
-Four observation types arise. $\texttt{NONE} \to \texttt{NONE}$ transitions reveal nothing about the parity function; as shown in Section~\ref{sec:brewrc-exp1}, their timing is governed by write-path serialization overhead with near-zero variance. $\texttt{BIPOLAR} \to \texttt{BIPOLAR}$ observations are similarly uninformative, as a forced bipolar data transition permits parity bits to transition in any polarity. Observations of $\texttt{NONE} \to \texttt{UNIPOLAR}_{N/P}$ or $\texttt{BIPOLAR} \to \texttt{UNIPOLAR}_{N/P}$ would violate the hypothesis that parity bit activity is the source of timing fluctuations; assertions confirm these are never observed.
-BREW-RC uses two observation classes to generate SAT constraints. $\texttt{UNIPOLAR}_{N/P} \to \texttt{UNIPOLAR}_{N/P}$ observations produce explicit constraints: given a unipolar data transition, no parity bits transitioned in an opposing polarity. $\texttt{UNIPOLAR}_{N/P} \to \texttt{BIPOLAR}$ observations produce existential constraints: given a unipolar data transition, at least one parity bit transitioned in an opposing polarity.
+where $\ell_{cw}$ reflects the codeword DHD and $\ell_d$ is the known
+transition polarity of the applied data. The relationship between the
+applied data label and the observed codeword label is written as $\ell_d
+	\to \ell_{cw}$. Four observation types arise. $\texttt{NONE} \to
+	\texttt{NONE}$ transitions reveal nothing about the parity function; as
+shown in Section~\ref{sec:brewrc-exp1}, their timing is governed by
+write-path serialization overhead with near-zero variance.
+$\texttt{BIPOLAR} \to \texttt{BIPOLAR}$ observations are similarly
+uninformative, as a forced bipolar data transition permits parity bits
+to transition in any polarity. Observations of $\texttt{NONE} \to
+	\texttt{UNIPOLAR}_{N/P}$ or $\texttt{BIPOLAR} \to
+	\texttt{UNIPOLAR}_{N/P}$ would violate the hypothesis that parity bit
+activity is the source of timing fluctuations; assertions confirm these
+are never observed. BREW-RC uses two observation classes to generate SAT
+constraints. $\texttt{UNIPOLAR}_{N/P} \to \texttt{UNIPOLAR}_{N/P}$
+observations produce explicit constraints: given a unipolar data
+transition, no parity bits transitioned in an opposing polarity.
+$\texttt{UNIPOLAR}_{N/P} \to \texttt{BIPOLAR}$ observations produce
+existential constraints: given a unipolar data transition, at least one
+parity bit transitioned in an opposing polarity.
 
 \subsection{Modeling Parity-Bit Activity}
 For a dataword $d \in \{0,1\}^k$, the codeword $c = dG = [d \mid p]$
@@ -19,7 +36,11 @@ For pre- and post-write states $(d_0, d_1)$, the parity-bit updates are:
 \begin{equation}
 	\Delta p = (d_0 + d_1)P = \Delta d\, P,
 \end{equation}
-where $\Delta d = d_0 + d_1$ marks toggled data bits. $\Delta p$ acts as a gate that determines which parity bits update under a given data transition, independent of transition polarity. In the SAT construction, $\Delta p$ is evaluated for every dataword transition and used in all clauses to restrict parity-bit activity to the toggled subset.
+where $\Delta d = d_0 + d_1$ marks toggled data bits. $\Delta p$ acts as
+a gate that determines which parity bits update under a given data
+transition, independent of transition polarity. In the SAT construction,
+$\Delta p$ is evaluated for every dataword transition and used in all
+clauses to restrict parity-bit activity to the toggled subset.
 
 \subsection{Polarity-Encoded SAT Formulation}
 \label{sec:sat-encoding} Each transition is assigned a data-polarity
@@ -35,9 +56,14 @@ encoded as:
 	\textit{pos}_j & \leftrightarrow \Delta p_j \wedge (\neg p_{0,j} \wedge p_{1,j}), \\
 	\textit{neg}_j & \leftrightarrow \Delta p_j \wedge (p_{0,j} \wedge \neg p_{1,j}),
 \end{align}
-which encode positive and negative parity transitions only when the parity bit is expected to update. Depending on $(\ell_d, \ell_{cw})$, one of four clause types is generated as summarized in Table~\ref{tab:polarity-clauses}.
-\input{contents/DAC_2026/tab/sat_clauses}
-Each $(d_0, d_1, \ell_d, \ell_{cw})$ tuple contributes a compact SAT subproblem constraining the allowed polarity of parity-bit transitions under a candidate parity submatrix $P$.
+which encode positive and negative parity transitions only when the
+parity bit is expected to update. Depending on $(\ell_d, \ell_{cw})$,
+one of four clause types is generated as summarized in
+Table~\ref{tab:polarity-clauses}.
+\input{contents/DAC_2026/tab/sat_clauses} Each $(d_0, d_1, \ell_d,
+	\ell_{cw})$ tuple contributes a compact SAT subproblem constraining the
+allowed polarity of parity-bit transitions under a candidate parity
+submatrix $P$.
 
 \subsection{Unipolar Random Word Walk}
 Because the preliminary experiments exercised only single-bit and
@@ -46,7 +72,10 @@ parity coupling between data bits in different bytes. A \emph{unipolar
 	random word walk} is introduced to systematically explore unipolar
 transitions over full word regions, efficiently sampling the word-level
 unipolar transition space. The procedure is described in
-Algorithm~\ref{alg:ruw}.
+Algorithm~\ref{alg:ruw}. By constructing a sequence consiting
+exclusively of unipolar transition, we guarantee that every data pattern
+will produce a constraint on the ECC parity sub matrix.
+
 \input{contents/DAC_2026/alg/alg-rand-unipolar-walk}
 
 \subsection{Data Collection and SAT Solving}
@@ -67,4 +96,6 @@ using CryptoMiniSAT~\cite{soos2009extending, soos2018cryptominisat5}.
 Since BREW-RC cannot infer the number of parity bits $r$ a priori, the
 solver is run for $r \in \{1, \ldots, k\}$, corresponding to all
 candidate matrices up to a code rate of 0.5. BREW-RC returns a single
-parity submatrix satisfying a unique $r$ for both the 4M and 8M.
+parity submatrix satisfying a unique $r$ for both the 4M and 8M. This
+approach is extremely parallelizable as each solver instance, with a
+unique $r$ assumption, is independent.

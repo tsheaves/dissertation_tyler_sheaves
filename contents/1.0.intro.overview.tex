@@ -1,192 +1,76 @@
-\label{chap:introduction} In the last decade, commercial resistive
-random-access memory (ReRAM) has entered mass production in the form of
-embedded non-volatile data storage modules for low-power
-microcontrollers and edge devices. These devices introduce stochastic
-timing properties with no direct analog in conventional memory
-technologies. The architectural features that produce these properties
-are not publicly disclosed by manufacturers. This combination of novel
-timing behavior and opaque architecture creates an underexplored attack
-surface with implications for both the security of deployed systems and
-the integrity of security primitives built on top of them.
+\label{chap:introduction}
 
-This dissertation proposes novel timing side-channels in commercial
-ReRAM through systematic experimental characterization of write latency
-in deployed devices. It identifies the dominant structural factors that
-impact timing behavior, demonstrates that those factors are recoverable
-through non-invasive side-channel analysis, and applies that structural
-knowledge to the characterization of stochastic timing behavior in
-commercial products.
+A recently discovered class of hardware side-channel vulnerabilities
+allows an attacker to recover remnants of prior activity from transistor
+devices in FPGA routing logic long after their logical erasure
+\cite{drewes2024pentimento}. The remnants that these attacks exploit
+have been termed \emph{pentimenti}, after the art history term for
+traces of an earlier composition that remain beneath the finished
+surface of a painting. As conventional pentimenti are revealed through
+X-ray radiography or infrared reflectography \cite{gooch2007visualizing,
+	daffara2011multispectral}, FPGA pentimenti are revealed through
+fine-grained timing measurement. These measurements reveal subtle
+variations in propagation delay that reveal physical evidence of the
+device's prior state, and prior users' activity.
 
-The contributions of this dissertation span two coupled problems: the
-recovery of \emph{hidden} device architecture through timing analysis,
-and the characterization of timing-based entropy sources in the context
-of these architecturual details. The solution to these two problems
-captures data-dependent switching dynamics that are required to reason
-about the full timing side-channel attack surface of commercial ReRAM.
-The remainder of this chapter motivates this work in the context of
-commercial ReRAM deployment and timing side-channel security
-(\S\ref{sec:motivation}), states the research objectives and
-contributions of this dissertation w.r.t. gaps in the existing
-literature (\S\ref{sec:objectives}), and describes the organization of
-the remaining chapters (\S\ref{sec:organization}).
+To date, FPGA pentimenti have been demonstrated only in the
+reconfigurable routing logic of Xilinx field-programmable gate arrays
+(FPGAs). The underlying mechanism is bias temperature instability (BTI),
+a recoverable wearout phenomenon that causes small, persistent drifts in
+transistor switching time under a prolonged stress bias. When a single
+bit of information is held in an FPGA routing net for an extended
+period, the accumulated BTI stress across all transistors propagating
+that bit produce subtle delay shifts large enough to be resolved by
+time-to-digital converter (TDC) sensors implemented in soft logic. The
+accuracy of these TDCs depends on phase-shift granularity provided by
+the FPGA's phase-locked loops (PLLs), which varies considerably between
+vendors. Prior demonstrations of FPGA pentimenti recovery have relied on
+the high-resolution PLL phase-shift capabilities available only on
+Xilinx products. As a first contribution, this dissertation closes this
+gap. We reformulate fine-grained sensor tuning as a constrained PLL
+configuration search, incorporating both phase shifting and frequency
+synthesis to compose a fine-grained phase sweep on Intel Cyclone V FPGAs
+without relying on high-resolution vendor-specific phase-shift
+capabilities.
 
-% % %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %%
+With pentimenti measurement now broadly accessible across FPGA vendors,
+we ask the following question: does the FPGA pentimenti attack class
+extend beyond FPGAs? BTI affects every CMOS transistor to varying
+degrees \cite{hill2021cmos}, and analogous defect dynamics do occur in
+many other semiconductor devices such as self-recovery in 3-D NAND cells
+\cite{luo2018heatwatch} and relaxation in phase-change memory
+\cite{le2018collective}. However, no techniques for constructing a
+non-invasive leakage channel like that of FPGA pentimenti attacks have
+been proposed.
 
-% % Old ramblings
+Resistive random-access memory (ReRAM) is a compelling candidate
+technology for the study of pentimenti-based attacks. In ReRAM, each bit
+is physically stored as a conductive filament state whose growth and
+rupture is dictated by stochastic defect dynamics~\cite{waser2009redox,
+	ambrogio2013understanding, Ielmini_2016}. The duration of each
+programming operation is dictated by these processes
+\cite{jo2009programmable, witzleben2017investigation}. This allows for
+leakage channels to be established which leak defect-dynamics-driven
+behavior through measurements of write latency. Unlike FPGAs, however,
+commercial ReRAM modules expose only a memory interface and defect
+dynamics cannot be measured directly as in FPGA pentimenti. Instead, the
+observable write latency reflects word-level switching activity that is
+dominated by data-dependent structural biases. These biases arise from
+write-controller polarity serialization across cells within a word and
+additional cell transitions introduced by undocumented embedded
+error-correcting codes (ECCs). Isolating the underlying stochastic
+component of programming time requires models of these structural timing
+biases.
 
-% %% %% %% %% %% %% %% %% %% %% %% % %% %% %% %% %% %% %% %% %% %% %% %%
-
-% Resistive random access memory (ReRAM) is an emerging memory technology
-% which simultaneously provides memristive properties, CMOS
-% compatibility, raditation hardness, non-volatile data storage,
-% low-latency/low-power read operations. These attributes uniquely
-% position ReRAM as a candidate technology in a number of analog and
-% digital application domains. In the last decade, commercial resistive
-% random access memories for low-power/embedded data storage applications
-% have entered mass production.
-
-% Field programmable gate arrays (FPGAs) are similar to ReRAM, in that
-% they can be coerced into many application spaces. FPGAs dominate where
-% reconfigurability is a key design requirement. Historically, prototying
-% has been the most significant application for FPGA parts. However, in
-% recent years FPGAs have been recognized as low-power, radiation
-% tolerant alternatives in a number of contexts including <>. Accorginly,
-% similar to ReRAM, FPGAs have been positioned in a broad collection of
-% military, aerospace, and automotive applications. Unlike ReRAMs, the
-% security of FPGA parts has been well studied in a number of contexts.
-% However, both ReRAM and FPGAs share a critical attack space with
-% remarkably similar exploitations.
-
-% Timing side-channel attacks to commercial resistive random access
-% memories. A side channel leaks information through an unexpected
-% emission.
-
-% Side-channels leverage unintended communication channels capable of
-% transmitting information. When these unintended communication channels
-% propagate sensitive information they are referred to as
-% \textit{leakage} channels. When leakage channels are (or can be made to
-% be) accessible to an unscrupulous character, called an adversary, they
-% become a threat vector. The operating conditions of a system in which
-% threat vectors exist is called a threat model. A security vulnerability
-% is declared with respect to a threat model. For a security
-% vulnerability to be concerning (meriting some form of action at design-
-% or run-time), both the consequences of ignoring the security
-% vulnerability and the practicality of the threat model must be
-% significant. The entire space of threat vectors which exist within a
-% threat model is called an attack surface.
-
-% All computation consumes energy. Accordingly, all computation consumes
-% non-zero time and non-zero power. In both digital and analog domains,
-% time and power are usually not intended to contain information
-% \footnote{<insert some transient- and power-based computing caveats,
-% they surely exist>}. Instead, electric potential, current, resistance,
-% and magnetic flux, which are more simple to control, are the preferred
-% media in which information is transformed, transacted, and retained.
-% However, non-zero energy is consumed when operations acting on these
-% media perform information transformation, transaction, and retention
-% \cite{<insert a citation - Shannon surely backs up all of this
-% somewhere>}. That is all operations acting on information, independent
-% of the selected media, produce signals in both power and time domains.
-% This fundamental observation generalizes many hardware security
-% challenges across analog and digital domains, and has led to the study
-% of power and timing side-channel attack surfaces.
-
-% In commercial products, manufacturers constrain the operating
-% conditions of designs with a document called a specification. Operating
-% commercial products outside of manufacturer specification can introduce
-% legitimate side-channel SVs. However, these attack surfaces would not
-% be considered SVs by the manufacturer. The most alarming side-channel
-% SVs emerge from systems operating within specification.
-
-% While some defects are regarded merely as problematic phenomena, others
-% are intentionally introduced to fulfill specific design goals or enable
-% desired functional behaviors. Over time, the processes of defect
-% generation, migration, and annihilation results in dynamic and often
-% unpredictable variations in device characteristics. This prospectus
-% proposes an investigation into the evolution of defects as a novel
-% source of information leakage through side-channel attacks.
-
-% To establish a theoretical foundation, the physical defect dynamics
-% amenable to side-channel exploitation are studied. Specifically, this
-% work investigates the potential for side-channel construction using the
-% reduction-oxidation reactions within the oxide layers of memristive
-% metal-insulator-metal (MIM) stacks and bias temperature instability
-% (BTI) occurring at the gate dielectric interface of CMOS transistors.
-% These phenomena induce subtle timing fluctuations that evolve over time
-% and exhibit dependencies on potentially sensitive internal information,
-% including user data and microarchitectural state. Through detailed
-% experimental analysis, these fluctuations are shown to be both
-% measurable and correlated with information and device
-% microarchitecture, enabling practical side-channel exploitation.
-
-% The feasibility and implications of such defect evolution side-channels
-% are explored in depth. For each phenomenon, a threat model is presented
-% to characterize how defect evolution can be leveraged by adversaries
-% operating under realistic constraints. The model is validated through
-% empirical evaluation on commercial hardware platforms, demonstrating
-% that the underlying vulnerabilities are not merely theoretical.
-% Finally, a suite of potential mitigation strategies is proposed.
-% Collectively, these findings underscore the need to consider physical
-% aging and defect dynamics as primary concerns in the design of secure
-% computing hardware.
-
-% % %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %% %%
-
-% % QE intro
-
-% %% %% %% %% %% %% %% %% %% %% %% % %% %% %% %% %% %% %% %% %% %% %% %%
-
-% In their 2017 Turing Award lecture, John Hennessy and David Patterson
-% highlighted the challenges posed by the end of Dennard scaling and the
-% slowing of Moore’s Law. They argued that continued progress in
-% computing would require significant innovation in both architecture and
-% hardware–software co-design. They predicted that the future of computer
-% architecture would be increasingly open, domain-specific,
-% heterogeneous, and security-conscious \cite{hennessy2019new}.
-
-% At the time of this lecture, the semiconductor industry had already
-% begun grappling with the end of several semiconductor paradigms.
-% Dennard scaling had effectively ended, and the rate of transistor
-% integration promised by Moore’s Law was showing signs of decline
-% \cite{mooreslaw2017}. The diminishing returns of multicore scaling had
-% been identified years prior \cite{esmaeilzadeh2011dark}. To meet the
-% surging global demand for computation, driven largely by machine
-% learning and artificial intelligence, industry and academia would need
-% to pivot toward domain-specific accelerators and specialized
-% architectures \cite{jouppi2017datacenter}. Additionally, a series of
-% devastating security disclosures revealed the vulnerability of modern
-% microarchitectures to side-channel attacks, particularly those
-% exploiting subtle variations in timing, power, and shared
-% microarchitectural state. Flush+Reload, Meltdown, and Spectre
-% demonstrated that speculative execution, cache sharing, and other
-% performance-oriented optimizations could unintentionally leak sensitive
-% information \cite{yarom2014flush+, lipp2018meltdown,
-% kocher2020spectre}. These vulnerabilities demonstrated that security
-% would need to be treated as a first-class design consideration at all
-% levels of the hardware–software stack.
-
-% Many of the trends Hennessy and Patterson anticipated have since
-% materialized. Today, advanced interposer technologies enable a single
-% package to integrate CPUs, GPUs, domain-specific accelerators, I/O,
-% memory, hardware roots of trust, all potentially using different
-% process technologies \cite{atabaki2018integrating, amdepyc, hexamesh,
-% securitychiplet}. Emerging memory technologies, such as resistive RAM
-% (ReRAM), phase-change memory (PCM), and magneto-resistive RAM (MRAM),
-% are being actively explored both as standalone memories and as
-% primitives in compute-in-memory (CIM) and domain-specific accelerator
-% architectures \cite{yu2021rram, pedersen2024neuromorphic}.
-% Reconfigurable computing platforms, specifically, field-programmable
-% gate arrays (FPGAs), continue to play a vital role in applications
-% where flexibility, performance-per-watt, and rapid adaptability are
-% critical. These platforms are especially attractive in edge computing,
-% real-time processing, and low-volume or constantly evolving domains
-% where hardened accelerators are not such as machine learning, data
-% science, genomics, medical devices, finance, and fully-homomorphic
-% encryption \cite{gandhare2019survey, turan2020heaws, chen2021high,
-% khan2024harnessing}.
-
-% The integration of multiple process technologies, device architectures,
-% and emerging memories, broadens the hardware attack surface
-% significantly. While these advancements will drive the continued
-% success of the semiconductor industry, they also open new pathways for
-% side-channel exploitation. \newpage
+This dissertation develops the reverse engineering and measurement
+infrastructure necessary to study pentimenti-class side-channels in
+commercial ReRAM. We characterize the dominant structural sources of
+write latency in commercial ReRAM crossbars, introduce \emph{Bit-exact
+	Recovery of ECC from Write Timing in ReRAM Crossbars} (BREW-RC) as the
+first non-invasive technique for recovering an embedded ECC parity
+submatrix from write timing alone, and use this structural understanding
+to isolate and characterize the stochastic component of write latency.
+Together, these contributions establish the required measurement
+capabilities for ReRAM pentimenti analysis. The remainder of this
+chapter states the research objectives and contributions of this
+dissertation and describes the organization of the remaining chapters.
