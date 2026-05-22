@@ -98,11 +98,12 @@ that is data-dependent on the prior user's activity, persists, and
 survives reads or reprogramming by the adversary. Each of these
 properties must be characterized experimentally before the attack class
 can be said to extend to commercial ReRAM. Measurement of filament
-degradation is a first step toward this objective. Other measurement
-defect dynamics, such as the relaxation dynamics described in
-\S\ref{sec:bg-defects} suggest that the post-RESET HRS distribution
-carries a measurable dependence on the cell's most recent SET history,
-and that dependence is the natural ReRAM analog of the recoverable BTI
-component exploited in FPGA Pentimenti, future work is required to
-determine how this and similar pentimenti mechanisms could be detected
-under the measurement framework presented in this work.
+degradation is a first step toward this objective.
+
+Filament degradation is not the only defect dynamic worth measuring. The
+relaxation dynamics described in \S\ref{sec:bg-defects} suggest that the
+post-RESET HRS distribution depends on the cell's most recent SET
+history. That dependence is the natural ReRAM analog of the recoverable
+BTI component exploited in FPGA Pentimenti. Whether the measurement
+framework in this dissertation can detect it, and similar pentimenti
+mechanisms, is left to future work.
