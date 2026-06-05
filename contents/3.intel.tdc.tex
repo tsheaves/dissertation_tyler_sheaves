@@ -9,10 +9,12 @@ with resolutions exceeding that of Xilinx's fine phase adjustment
 capabilities even on FPGAs supporting only coarse phase adjustments.
 This capability enables high-resolution measurements of propagation
 delay suitable for measurement of timing fluctuations due to BTI. This
-work shows the sensor capabilities in a spatial multi-tenant threat
-model, however it demonstrates a cross-platform voltage fluctuation
-sensor and tuning methodology that can be repurposed in the same manner
-as \cite{drewes2024pentimento}.
+work shows the sensor tuning capabilities in a spatial multi-tenant
+threat model, however it demonstrates a cross-platform voltage
+fluctuation sensor and tuning methodology that can be repurposed in the
+same manner as \cite{drewes2024pentimento}. The voltage fluctuation
+sensor simply adds a secondary phase shifting parameter which enables
+phase alignment between attacker and victim clock domains.
 
 \input{fig/tunable_tdc_sys}
 
@@ -264,6 +266,27 @@ clearly distinguishable, demonstrating that the Altera voltage
 fluctuation sensor is able to achieve a fine-grained identification of
 the target clock.
 
+\section{Relaxing Upstream and Downstream $F_{out}$}
+\label{sec:cascaded-clock-relaxation}
+
+\input{fig/zu1cg_prop.tex}
+
+The above implementation provides feature parity between Altera and
+Xilinx FPGA sensor implmentations. That is, typical phase step
+increments on Altera now meet or exceed that of Xilinx's advertised
+phase step granularity. However, the implementation shown in the last
+section has stringent output clock constraints. These constraints can be
+relaxed for propagation delay measurement purposes. In his thesis, Sean
+Manger (University of California, Santa Cruz) demonstrates that
+frequency relaxation can produce extended phase step granularity
+improvements. Figure \ref{fig:1cg-prop-dist} shows the results of a
+$\theta$-sweep performed on a Xilinx Ultrascale+ FPGA on an Avnet
+ZUBoard 1CG platform with relaxed frequencies.
+
+By relaxing the frequencies this implementation is able to achieve a
+median phase step granularity of 3 femtoseconds, demonstrating a 3 order
+of magnitude improvement in phase-step granularity over prior work.
+
 \section{Implications for FPGA Pentimenti}
 \label{sec:fpga-pentimenti-implications}
 
@@ -283,15 +306,24 @@ family whose default phase shift is set as $T_{VCO}/k$ for a small fixed
 integer $k$, and whose PLL primitives expose dynamic counter
 reconfiguration, allows the same approach. The number of valid integer
 solutions to $F_{out}/F_{ref} = M/(N \cdot O)$ grows quickly as the
-bounds on $(M, N, O)$ are widened.
+bounds on $(M, N, O)$ are widened. By relaxing the upstream and
+downstream frequency bounds, phase step increments of only a few
+femtoseconds can be generated, achieving tuning resolutions previously
+only possible with invasive off-chip clock generation techniques
+\cite{zick2015gaining}.
 
-This chapter demonstrates the sensor capability required for pentimenti
-recovery on Intel platforms, not pentimenti recovery itself. Closing
-that remaining gap requires characterization of the recoverable BTI
-component on Cyclone~V's process node and verification that the
-cumulative stress signatures targeted in \cite{drewes2024pentimento}
-survive reconfiguration in the same manner. The mechanism underlying BTI
-is shared across CMOS process nodes (Section~\ref{sec:bg-bti}), and the
-measurement infrastructure to resolve its delay signature on Intel parts
-has now been implemented.
+\section{Semiconductor Pentimenti Beyond FPGAs}
+\label{sec:fpga-pentimenti-implications}
 
+The mechanism underlying BTI is shared across CMOS process nodes
+(Section~\ref{sec:bg-bti}), and the measurement infrastructure to
+resolve its delay signature on Intel parts has now been implemented.
+However, the applicability of these attacks to alternative architectures
+or alternative semiconductor devices presents a more significant
+research challenge. Resistive random-access memories (ReRAMs) are an
+emerging memory technology which exploits defect dynamics by design.
+However, unlike in FPGAs, where instrumentation is facilitated by a
+highly programmable fabric, ReRAM devices expose only a memory
+interface. ReRAM architectures expose information leakage channels
+through unique timing behavior. In the remaining chapters, we study how
+semiconductor pentimenti may be exploited through timing analyses.
